@@ -1,0 +1,2 @@
+sudo apt-get install -y python3-pip python3-argcomplete python3-asyncssh python3-aiohttp
+sudo pip3 install treelib
