@@ -188,7 +188,7 @@ class TarballFile(UpdateFile):
       auto_path_hdf = os.path.join(self.unpackpath, 'cpe_auto.hdf')
       if os.path.isfile(auto_path_hdf):
         logging.debug("Found cpe_auto.hdf")
-        shutil.unpack_archive(auto_path_zip, self.unpackpath, format="zip")
+        shutil.unpack_archive(auto_path_hdf, self.unpackpath, format="zip")
 
   def set_unpackdir(self, unpackdir):
     if self.unpackpath is not None:
