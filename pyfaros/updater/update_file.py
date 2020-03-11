@@ -8,7 +8,6 @@ from functools import partial
 from pyfaros.discover.discover import CPERemote, HubRemote, IrisRemote
 
 log = logging.getLogger(__name__)
-log.setLevel(level=logging.DEBUG)
 
 def sha256sum(filename):
   try:

@@ -17,7 +17,6 @@ from pyfaros.updater.update_file import (BootBin, BootBit, ImageUB, Ps7Init,
 _getfirst = lambda x: x[0] if len(x) > 0 else None
 
 log = logging.getLogger(__name__)
-log.setLevel(level=logging.DEBUG)
 
 def _fill_namedtup(mapping, variant, manifest=None, imageub=None, bootbin=None):
   nt = mapping[variant]
