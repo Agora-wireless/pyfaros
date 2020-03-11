@@ -8,6 +8,7 @@ from functools import partial
 from pyfaros.discover.discover import CPERemote, HubRemote, IrisRemote
 
 log = logging.getLogger(__name__)
+log.setLevel(level=logging.DEBUG)
 
 def sha256sum(filename):
   try:
@@ -114,6 +115,18 @@ class ImageUB(UpdateFile):
   def variant_specific_check_command(self):
     return None
 
+class Ps7Init(UpdateFile):
+
+  def __init__(self, path, manifest=None, variant_given=None):
+    super().__init__(path, manifest=None, variant_given=variant_given) # Not in manifest, always set to None
+    
+    self.remote_name = "ps7_init.tcl" # Should never need to copy this file
+
+  def variant_family_check_command(self):
+    return None
+
+  def variant_specific_check_command(self):
+    return None
 
 class BootBin(UpdateFile):
 
@@ -155,7 +168,7 @@ class TarballFile(UpdateFile):
         manifest=manifest,
         family_given=family_given,
         variant_given=variant_given)
-    logging.debug("tarballfile made")
+    log.debug("tarballfile made")
     self.unpackpath = unpackpath
 
   def variant_family_check_command(self):
@@ -166,12 +179,17 @@ class TarballFile(UpdateFile):
 
   def unpack(self):
     if self.unpackpath is None:
-      logging.debug("failed unpacking {} to {}!".format(self.path,
+      log.debug("failed unpacking {} to {}!".format(self.path,
                                                         self.unpackpath))
       raise ValueError("Can't unpack tarball without path being set")
     else:
-      logging.debug("unpacking {} to {}!".format(self.path, self.unpackpath))
+      log.debug("unpacking {} to {}!".format(self.path, self.unpackpath))
       shutil.unpack_archive(self.path, self.unpackpath)
+      # Attempt to also unpack the nested cpe_auto.hdf TODO maybe this code doesn't belong here
+      auto_path_hdf = os.path.join(self.unpackpath, 'cpe_auto.hdf')
+      if os.path.isfile(auto_path_hdf):
+        logging.debug("Found cpe_auto.hdf")
+        shutil.unpack_archive(auto_path_zip, self.unpackpath, format="zip")
 
   def set_unpackdir(self, unpackdir):
     if self.unpackpath is not None:

@@ -6,7 +6,7 @@ with open('requirements.txt') as fp:
 
 setuptools.setup(
     name="pyfaros",
-    version="0.0.1",
+    version="0.0.2",
     author="Skylark Wireless",
     description="discover/update skylark wireless devices",
     url="https://gitlab.com/skylark-wireless/software/sklk-utils/",

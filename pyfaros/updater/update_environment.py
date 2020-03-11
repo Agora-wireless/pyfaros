@@ -11,10 +11,13 @@ from typing import Mapping, List
 
 from pyfaros.discover.discover import (CPERemote, HubRemote, IrisRemote,
                                              Remote)
-from pyfaros.updater.update_file import (BootBin, BootBit, ImageUB,
+from pyfaros.updater.update_file import (BootBin, BootBit, ImageUB, Ps7Init,
                                                  Manifest, TarballFile, UpdateFile)
 
 _getfirst = lambda x: x[0] if len(x) > 0 else None
+
+log = logging.getLogger(__name__)
+log.setLevel(level=logging.DEBUG)
 
 def _fill_namedtup(mapping, variant, manifest=None, imageub=None, bootbin=None):
   nt = mapping[variant]
@@ -22,6 +25,8 @@ def _fill_namedtup(mapping, variant, manifest=None, imageub=None, bootbin=None):
   b_file = _getfirst(glob(nt.unpackdir + "/BOOT.BIN"))
   i_file = _getfirst(glob(nt.unpackdir + "/image.ub"))
   bit_file = _getfirst(glob(nt.unpackdir + "/*_top.bin"))
+  ps7_init = _getfirst(glob(nt.unpackdir + "/ps7_init.tcl"))
+
   if m_file is not None:
     nt.manifest = Manifest(m_file)
   if b_file is not None:
@@ -30,6 +35,8 @@ def _fill_namedtup(mapping, variant, manifest=None, imageub=None, bootbin=None):
     nt.imageub = ImageUB(i_file, manifest=nt.manifest, variant_given=variant)
   if bit_file is not None:
     nt.bootbit = BootBit(bit_file, manifest=nt.manifest, variant_given=variant)
+  if ps7_init is not None:
+    nt.ps7_init = Ps7Init(ps7_init, manifest=nt.manifest, variant_given=variant)
 
 
 class UpdateEnvironment:
@@ -72,7 +79,7 @@ class UpdateEnvironment:
     self.root_tmpdir = None
     self.mapping = {
         v: namedtuple("UpdateFiles",
-                      "manifest imageub bootbin bootbit unpackdir")
+                      "manifest imageub bootbin bootbit unpackdir ps7_init")
         for v in list(IrisRemote.Variant) + list(HubRemote.Variant) +
         list(CPERemote.Variant)
     }
@@ -104,6 +111,7 @@ class UpdateEnvironment:
       v.imageub = None
       v.bootbin = None
       v.bootbit = None
+      v.ps7_init = None
 
     logging.debug(self.mode)
     if self.mode == UpdateEnvironment.Mode.UNIVERSAL_TARBALL:
@@ -141,7 +149,7 @@ class UpdateEnvironment:
               _getfirst(glob(self.root_tmpdir + "/.unpack/manifest.txt")))
           logging.debug(outer_manifest)
       for tarball in self.individual_tarball_paths:
-        logging.debug(tarball)
+        log.debug(tarball)
         as_obj = TarballFile(
             tarball,
             manifest=outer_manifest,
