@@ -94,7 +94,7 @@ class Remote:
       ])
       yield list(connections)
 
-  def __init__(self, soapy_dict):
+  def __init__(self, soapy_dict, loop=None):
     self.driver = soapy_dict["driver"] if "driver" in soapy_dict else None
     self.firmware = soapy_dict["firmware"] if "firmware" in soapy_dict else None
     self.fpga = soapy_dict["fpga"] if "fpga" in soapy_dict else None
@@ -109,8 +109,9 @@ class Remote:
     self.address = None  # default no known url
     self._json_url = None  # default no known url
     self._json = None  # default no json
-    self._ssh_lock = asyncio.Lock(
-    )  # ensure only one connection exists at a time.
+    self._aioloop = loop if loop is not None else asyncio.get_event_loop()
+    # ensure only one connection exists at a time.
+    self._ssh_lock = asyncio.Lock(loop=self._aioloop)
     self.ssh_connection = None
     self.ssh_session = MethodType(Remote._ssh_session_no_connection, self)
 
@@ -146,8 +147,8 @@ class CPERemote(Remote):
     RRH = "cpe_rrh"
     STANDARD = "cpe"
 
-  def __init__(self, soapy_dict):
-    super().__init__(soapy_dict)
+  def __init__(self, soapy_dict, loop=None)
+    super().__init__(soapy_dict, loop=loop)
     self.rrh_head = None
     # About us, set by us
     self.last_mac = None
@@ -194,8 +195,8 @@ class IrisRemote(Remote):
     UE = "iris030_ue"
     STANDARD = "iris030"
 
-  def __init__(self, soapy_dict):
-    super().__init__(soapy_dict)
+  def __init__(self, soapy_dict, loop=None)
+    super().__init__(soapy_dict, loop=loop)
     # Unique soapy keys
     self.sfp_serial = soapy_dict.get("sfpSerial", None)
     self.sfp_version = soapy_dict.get("sfpVersion", None)
@@ -370,8 +371,8 @@ class HubRemote(Remote):
             return chain
       return None
 
-  def __init__(self, soapy_dict):
-    super().__init__(soapy_dict)
+  def __init__(self, soapy_dict, loop=None)
+    super().__init__(soapy_dict, loop=loop)
     self.cpld = soapy_dict["cpld"] if "cpld" in soapy_dict else None
     url = urllib.parse.urlparse(self.remote)
     self.address = url.hostname
@@ -458,7 +459,7 @@ class Discover:
     self.time = datetime.datetime.now()
     # Grab an event loop so that we can get all of the json additional
     # information at once.
-    self._loop = asyncio.new_event_loop()
+    self._loop = asyncio.get_event_loop()
     # Avahi broadcasts occasionally don't respond in time. Do it with a
     # long timeout, and do it a lot, to try to get a good picture.
     soapy_enumerations = {}
@@ -480,6 +481,7 @@ class Discover:
                 x.keys() and "iris" in x["remote:type"] and "serial" in x.keys(
                 ) and "CP" not in x["serial"],
                 self._soapy_enumerate,
+                loop=self._loop,
             ),
         ))
 
@@ -493,6 +495,7 @@ class Discover:
                 ("remote:type" in x.keys() and "iris" in x["remote:type"] and
                  "serial" in x.keys() and "CP" in x["serial"]),
                 self._soapy_enumerate,
+                loop=self._loop,
             ),
         ))
 
@@ -503,6 +506,7 @@ class Discover:
                 lambda x: "remote:type" in x.keys() and "faros" in x[
                     "remote:type"],
                 self._soapy_enumerate,
+                loop=self._loop,
             ),
         ))
     # Stage up the fetches
