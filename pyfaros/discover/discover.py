@@ -147,7 +147,7 @@ class CPERemote(Remote):
     RRH = "cpe_rrh"
     STANDARD = "cpe"
 
-  def __init__(self, soapy_dict, loop=None)
+  def __init__(self, soapy_dict, loop=None):
     super().__init__(soapy_dict, loop=loop)
     self.rrh_head = None
     # About us, set by us
@@ -195,7 +195,7 @@ class IrisRemote(Remote):
     UE = "iris030_ue"
     STANDARD = "iris030"
 
-  def __init__(self, soapy_dict, loop=None)
+  def __init__(self, soapy_dict, loop=None):
     super().__init__(soapy_dict, loop=loop)
     # Unique soapy keys
     self.sfp_serial = soapy_dict.get("sfpSerial", None)
@@ -371,7 +371,7 @@ class HubRemote(Remote):
             return chain
       return None
 
-  def __init__(self, soapy_dict, loop=None)
+  def __init__(self, soapy_dict, loop=None):
     super().__init__(soapy_dict, loop=loop)
     self.cpld = soapy_dict["cpld"] if "cpld" in soapy_dict else None
     url = urllib.parse.urlparse(self.remote)
