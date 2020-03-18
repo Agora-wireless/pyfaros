@@ -6,7 +6,7 @@ import time
 import urllib
 from collections import OrderedDict
 from enum import Enum
-from functools import reduce
+from functools import reduce, partial
 from types import MethodType
 
 import aiohttp
@@ -475,38 +475,35 @@ class Discover:
     # FIXME: Hacks here until all cpes have a sane fpga string.
     self._irises = list(
         map(
-            IrisRemote,
+            partial(IrisRemote, loop=self._loop),
             filter(
                 lambda x: "remote:type" in
                 x.keys() and "iris" in x["remote:type"] and "serial" in x.keys(
                 ) and "CP" not in x["serial"],
                 self._soapy_enumerate,
-                loop=self._loop,
             ),
         ))
 
     # FIXME: change this when fpga strings are sane
     self._cpes = list(
         map(
-            CPERemote,
+            partial(CPERemote, loop=self._loop),
             filter(
                 lambda x: "remote:type" in x.keys() and "cpe" in x["remote:type"
                                                                   ] or
                 ("remote:type" in x.keys() and "iris" in x["remote:type"] and
                  "serial" in x.keys() and "CP" in x["serial"]),
                 self._soapy_enumerate,
-                loop=self._loop,
             ),
         ))
 
     self._hubs = list(
         map(
-            HubRemote,
+            partial(HubRemote, loop=self._loop),
             filter(
                 lambda x: "remote:type" in x.keys() and "faros" in x[
                     "remote:type"],
                 self._soapy_enumerate,
-                loop=self._loop,
             ),
         ))
     # Stage up the fetches
