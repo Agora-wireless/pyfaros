@@ -459,7 +459,7 @@ class Discover:
     self.time = datetime.datetime.now()
     # Grab an event loop so that we can get all of the json additional
     # information at once.
-    self._loop = asyncio.get_event_loop()
+    self._loop = asyncio.new_event_loop()
     # Avahi broadcasts occasionally don't respond in time. Do it with a
     # long timeout, and do it a lot, to try to get a good picture.
     soapy_enumerations = {}
