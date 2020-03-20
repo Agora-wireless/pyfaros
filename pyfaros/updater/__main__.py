@@ -48,6 +48,11 @@ if __name__ == '__main__':
       help="Update all standalone iris nodes",
       action="store_true",
       default=False)
+  parser.add_argument(i
+      '--dry-run',
+      help="Don't actuall do the update.",
+      action="store_true",
+      default=False)
 
   for device in [IrisRemote, CPERemote, HubRemote]:
     for v1 in device.Variant:
@@ -125,9 +130,10 @@ if __name__ == '__main__':
             update_environment.mapping[device.variant].bootbin,
             update_environment.mapping[device.variant].bootbit,
             update_environment.mapping[device.variant].imageub))
-      loop = asyncio.get_event_loop()
-      loop.run_until_complete(do_update(update_environment, discovered))
-      loop.close()
+      if not args.dry_run:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(do_update(update_environment, discovered))
+        loop.close()
   except Exception as e:
     logging.debug(e)
     raise e
