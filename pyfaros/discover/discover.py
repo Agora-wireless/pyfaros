@@ -298,8 +298,10 @@ class RRH:
     self.head = heads[0] if heads else None
     self.address = self.head.address if self.head else None
     self.hub = hub
-    self.config = self.head._json["sfp"].get("config", {}).get(
-        "rrh", None) if self.head else None
+    sfp_info = self.head._json["sfp"]
+    if sfp_info == "None":
+      sfp_info = {}
+    self.config = sfp_info.get("config", {}).get("rrh", None) if self.head else None
     if self.config is None:
       raise NotAnRRH()
     self.nodes = list(sorted(members, key=lambda x: x.rrh_index))
