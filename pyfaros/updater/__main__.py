@@ -48,7 +48,7 @@ if __name__ == '__main__':
       help="Update all standalone iris nodes",
       action="store_true",
       default=False)
-  parser.add_argument(i
+  parser.add_argument(
       '--dry-run',
       help="Don't actuall do the update.",
       action="store_true",
