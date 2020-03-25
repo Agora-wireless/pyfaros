@@ -184,8 +184,8 @@ class CPERemote(Remote):
       return None
 
   def __str__(self):
-    return "{: <10} - {: <29} - FPGA: {}".format(self.serial, self.address,
-                                                 self.fpga)
+      return "{: <10} - {: <29} - FW: {} FPGA: {}".format(self.serial, self.address,
+                                                 self.firmware, self.fpga)
 
 class VgerRemote(Remote):
 
@@ -306,8 +306,8 @@ class IrisRemote(Remote):
       self.rrh_member = False
 
   def details(self):
-    return "{: <10} - {: <29} - FPGA: {}".format(self.serial, self.address,
-                                                 self.fpga)
+      return "{: <10} - {: <29} - FW: {} FPGA: {}".format(self.serial, self.address,
+                                                 self.firmware, self.fpga)
 
   def __str__(self):
     return "{}:{}".format(self.rrh_index if self.rrh_index >= 0 else "",
@@ -662,8 +662,9 @@ class Discover:
         if isinstance(irises, RRH) and irises.serial:
           thischainidx = c()
           t.create_node(
-              "Chain {}  Serial {}  Count {}  FPGA {} {}".format(
+              "Chain {}  Serial {}  Count {}  FW {} FPGA {} {}".format(
                   chidx, irises.serial, len(list(irises)),
+                  self.get_common(irises, 'firmware'),
                   self.get_common(irises, 'fpga'),
                   "(FIX SFP CONFIG)" if not irises.config_correct else ""),
               thischainidx,
@@ -681,8 +682,10 @@ class Discover:
         elif len(irises) > 0:
           thischainidx = c()
           t.create_node(
-              "Chain {}  Count: {} FPGA {}  (Not RRH)".format(
-                  chidx, len(irises), self.get_common(irises.values(), 'fpga')),
+              "Chain {}  Count: {} FW {} FPGA {}  (Not RRH)".format(
+                  chidx, len(irises),
+                  self.get_common(irises.values(), 'firmware'),
+                  self.get_common(irises.values(), 'fpga')),
               thischainidx,
               parent=thishubidx,
           )
@@ -698,8 +701,9 @@ class Discover:
     if self._standalone_irises:
       standalone = c()
       t.create_node(
-          "Standalone Count: {}  FPGA {}".format(
+          "Standalone Count: {}  FW {} FPGA {}".format(
               len(self._standalone_irises),
+              self.get_common(self._standalone_irises, 'firmware'),
               self.get_common(self._standalone_irises, 'fpga')),
           standalone,
           parent=first_node)
