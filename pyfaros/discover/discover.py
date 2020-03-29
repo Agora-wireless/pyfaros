@@ -187,6 +187,48 @@ class CPERemote(Remote):
     return "{: <10} - {: <29} - FPGA: {}".format(self.serial, self.address,
                                                  self.fpga)
 
+class VgerRemote(Remote):
+
+  class Variant(_RemoteEnum):
+    VGER = "vger"
+
+  def __init__(self, soapy_dict, loop=None):
+    super().__init__(soapy_dict, loop=loop)
+    self.rrh_head = None
+    # About us, set by us
+    self.last_mac = None
+    url = urllib.parse.urlparse(self.remote)
+    self.address = url.hostname
+    if "fe80" in self.address:
+      self.address = "[" + self.address + "]"
+    self._json_url = url._replace(scheme="http", netloc=self.address).geturl()
+    self.variant = Self.Variant.VGER
+    # After e2400b4a9647f633086d1088b61460c03e79f616 is merged into sklk-dev, we can check device type.
+    # https://gitlab.com/skylark-wireless/software/sklk-dev/-/merge_requests/94
+
+  def __iter__(self):
+    yield self
+    return
+
+  @asyncio.coroutine
+  async def afetch(self):
+    try:
+      await super().afetch()
+      self.last_mac = int(self._json["extra"]["gateway_addr"], 16)
+      self.rrh_head = (
+          reduce(
+              lambda x, y: x[y] if x is not None and y in x else None,
+              ["sfp", "config", "rrh", "serial"],
+              self._json,
+          ) is not None)
+      return self
+    except Exception as e:
+      log.debug(e)
+      return None
+
+  def __str__(self):
+    return "{: <10} - {: <29} - FPGA: {}".format(self.serial, self.address,
+                                                 self.fpga)
 
 class IrisRemote(Remote):
 
@@ -480,8 +522,8 @@ class Discover:
             partial(IrisRemote, loop=self._loop),
             filter(
                 lambda x: "remote:type" in
-                x.keys() and "iris" in x["remote:type"] and "serial" in x.keys(
-                ) and "CP" not in x["serial"],
+                x.keys() and "iris" in x["remote:type"] and "serial" in x.keys() 
+                and "CP" not in x["serial"],
                 self._soapy_enumerate,
             ),
         ))
@@ -491,10 +533,19 @@ class Discover:
         map(
             partial(CPERemote, loop=self._loop),
             filter(
-                lambda x: "remote:type" in x.keys() and "cpe" in x["remote:type"
-                                                                  ] or
-                ("remote:type" in x.keys() and "iris" in x["remote:type"] and
-                 "serial" in x.keys() and "CP" in x["serial"]),
+                lambda x: "remote:type" in x.keys() and "cpe" in x["remote:type"] and
+                 "serial" in x.keys() and "CP" in x["serial"],
+                self._soapy_enumerate,
+            ),
+        ))
+
+    # FIXME: confirm correct strings for this
+    self._vgers = list(
+        map(
+            partial(VgerRemote, loop=self._loop),
+            filter(
+                lambda x: "remote:type" in x.keys() and "cpe" in x["remote:type"] and
+                 "serial" in x.keys() and "VG" in x["serial"],
                 self._soapy_enumerate,
             ),
         ))
@@ -521,6 +572,12 @@ class Discover:
             self._cpes,
         ),
         loop=self._loop)
+    vger_fetch_tasks = asyncio.gather(
+        *map(
+            lambda x: asyncio.ensure_future(x.afetch(), loop=self._loop),
+            self._vgers,
+        ),
+        loop=self._loop)
     hub_fetch_tasks = asyncio.gather(
         *map(
             lambda x: asyncio.ensure_future(x.afetch(), loop=self._loop),
@@ -530,7 +587,7 @@ class Discover:
     # Go, go, go!
     fetchall = asyncio.ensure_future(
         asyncio.gather(
-            iris_fetch_tasks, hub_fetch_tasks, cpe_fetch_tasks,
+            iris_fetch_tasks, hub_fetch_tasks, cpe_fetch_tasks, vger_fetch_tasks,
             loop=self._loop),
         loop=self._loop,
     )
@@ -664,6 +721,12 @@ class Discover:
         # Keep the extra space here, formats nicely against Iris being 1 char longer
         t.create_node("CPE  {}".format(str(cpe)), c(), parent=pidx)
 
+    if len(self._vgers) > 0:
+      pidx = c()
+      t.create_node("Standalone VGERs", pidx, parent=first_node)
+      for vger in self._vgers:
+        t.create_node("VGER {}".format(str(vger)), c(), parent=pidx)
+
     return str(t)
 
   def __iter__(self):
@@ -674,6 +737,8 @@ class Discover:
       yield iris
     for cpe in self._cpes:
       yield cpe
+    for vger in self._vgers:
+      yield vger
 
   class Sortings:
 
