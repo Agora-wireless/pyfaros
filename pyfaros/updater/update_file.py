@@ -5,7 +5,7 @@ import shutil
 import subprocess
 from functools import partial
 
-from pyfaros.discover.discover import CPERemote, HubRemote, IrisRemote
+from pyfaros.discover.discover import CPERemote, HubRemote, IrisRemote, VgerRemote
 
 log = logging.getLogger(__name__)
 
@@ -72,7 +72,8 @@ class UpdateFile:
         raise ValueError(
             "{0} created for path {1}, but that file does not seem to be a {0} or does not exist"
             .format(self.__class__.__name__, self.path))
-      v_family = IrisRemote.Variant if "iris030" in run.stdout else HubRemote.Variant if "faroshub04" in run.stdout else CPERemote.Variant if "cpe" in run.stdout else None
+      v_family = IrisRemote.Variant if "iris030" in run.stdout else HubRemote.Variant if "faroshub04" in run.stdout else \
+                  CPERemote.Variant if "cpe" in run.stdout else VgerRemote.Variant if "vger" in run.stdout else None
     # Specific
     if v_family is not None and self.variant_specific_check_command(
     ) is not None:
@@ -96,6 +97,8 @@ class UpdateFile:
             v_specific = CPERemote.Variant.RRH if "cpe_rrh" in str(
                 run2.stdout
             ) else CPERemote.Variant.STANDARD if "cpe" in run2.stdout else None
+          elif v_family is VgerRemote.Variant:
+            v_specific = VgerRemote.Variant.VGER
     return (v_family, v_specific)
 
 
@@ -185,9 +188,15 @@ class TarballFile(UpdateFile):
       log.debug("unpacking {} to {}!".format(self.path, self.unpackpath))
       shutil.unpack_archive(self.path, self.unpackpath)
       # Attempt to also unpack the nested cpe_auto.hdf TODO maybe this code doesn't belong here
+      # Seeing as RJ is now the maintainer for this code I'll just do it in the lazy way:
       auto_path_hdf = os.path.join(self.unpackpath, 'cpe_auto.hdf')
       if os.path.isfile(auto_path_hdf):
         logging.debug("Found cpe_auto.hdf")
+        shutil.unpack_archive(auto_path_hdf, self.unpackpath, format="zip")
+
+      auto_path_hdf = os.path.join(self.unpackpath, 'vger_auto.hdf')
+      if os.path.isfile(auto_path_hdf):
+        logging.debug("Found vger_auto.hdf")
         shutil.unpack_archive(auto_path_hdf, self.unpackpath, format="zip")
 
   def set_unpackdir(self, unpackdir):

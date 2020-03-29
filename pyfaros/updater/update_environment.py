@@ -10,7 +10,7 @@ import typing
 from typing import Mapping, List
 
 from pyfaros.discover.discover import (CPERemote, HubRemote, IrisRemote,
-                                             Remote)
+                                             Remote, VgerRemote)
 from pyfaros.updater.update_file import (BootBin, BootBit, ImageUB, Ps7Init,
                                                  Manifest, TarballFile, UpdateFile)
 
@@ -80,7 +80,7 @@ class UpdateEnvironment:
         v: namedtuple("UpdateFiles",
                       "manifest imageub bootbin bootbit unpackdir ps7_init")
         for v in list(IrisRemote.Variant) + list(HubRemote.Variant) +
-        list(CPERemote.Variant)
+        list(CPERemote.Variant) + list(VgerRemote.Variant)
     }
     if self.mode is None or self.mode not in list(UpdateEnvironment.Mode):
       e = ValueError("Update context mode must be one of {}".format(

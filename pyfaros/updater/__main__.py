@@ -8,7 +8,7 @@ from pyfaros.updater.updater import do_update
 from pyfaros.updater.update_file import UpdateFile
 from pyfaros.updater.update_environment import UpdateEnvironment
 import pyfaros.discover
-from pyfaros.discover.discover import Discover, CPERemote, IrisRemote, HubRemote
+from pyfaros.discover.discover import Discover, CPERemote, IrisRemote, HubRemote, VgerRemote
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(
@@ -54,7 +54,7 @@ if __name__ == '__main__':
       action="store_true",
       default=False)
 
-  for device in [IrisRemote, CPERemote, HubRemote]:
+  for device in [IrisRemote, CPERemote, HubRemote, VgerRemote]:
     for v1 in device.Variant:
       for v2 in device.Variant:
         if v2 is not v1:
@@ -99,7 +99,7 @@ if __name__ == '__main__':
       logging.debug(args)
 
       logging.debug("Looking for remaps, and remapping")
-      for device in [IrisRemote, CPERemote, HubRemote]:
+      for device in [IrisRemote, CPERemote, HubRemote, VgerRemote]:
         for v1 in device.Variant:
           for v2 in device.Variant:
             if v2 is not v1:
