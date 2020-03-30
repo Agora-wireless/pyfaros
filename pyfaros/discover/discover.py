@@ -202,7 +202,7 @@ class VgerRemote(Remote):
     if "fe80" in self.address:
       self.address = "[" + self.address + "]"
     self._json_url = url._replace(scheme="http", netloc=self.address).geturl()
-    self.variant = Self.Variant.VGER
+    self.variant = VgerRemote.Variant.VGER
     # After e2400b4a9647f633086d1088b61460c03e79f616 is merged into sklk-dev, we can check device type.
     # https://gitlab.com/skylark-wireless/software/sklk-dev/-/merge_requests/94
 
