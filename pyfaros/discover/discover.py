@@ -41,6 +41,12 @@ class _RemoteEnum(Enum):
 
 
 class Remote:
+  @classmethod
+  def mac_to_uaa_id(cls, mac):
+    uaa_id = 0
+    for byte_idx in range(3):
+      uaa_id += ((mac >> (byte_idx*8))&0xff) << ((2-byte_idx)*8)
+    return uaa_id
 
   @asynccontextmanager
   async def _ssh_session_no_connection(self):
@@ -152,6 +158,7 @@ class CPERemote(Remote):
     self.rrh_head = None
     # About us, set by us
     self.last_mac = None
+    self.uaa_id = None
     url = urllib.parse.urlparse(self.remote)
     self.address = url.hostname
     if "fe80" in self.address:
@@ -172,6 +179,7 @@ class CPERemote(Remote):
     try:
       await super().afetch()
       self.last_mac = int(self._json["extra"]["gateway_addr"], 16)
+      self.uaa_id = self.mac_to_uaa_id(self.last_mac)
       self.rrh_head = (
           reduce(
               lambda x, y: x[y] if x is not None and y in x else None,
@@ -197,6 +205,7 @@ class VgerRemote(Remote):
     self.rrh_head = None
     # About us, set by us
     self.last_mac = None
+    self.uaa_id = None
     url = urllib.parse.urlparse(self.remote)
     self.address = url.hostname
     if "fe80" in self.address:
@@ -215,6 +224,7 @@ class VgerRemote(Remote):
     try:
       await super().afetch()
       self.last_mac = int(self._json["extra"]["gateway_addr"], 16)
+      self.uaa_id = self.mac_to_uaa_id(self.last_mac)
       self.rrh_head = (
           reduce(
               lambda x, y: x[y] if x is not None and y in x else None,
@@ -248,6 +258,7 @@ class IrisRemote(Remote):
 
     # About us, set by us
     self.last_mac = None
+    self.uaa_id = None
     url = urllib.parse.urlparse(self.remote)
     self.address = url.hostname
     if "fe80" in self.address:
@@ -274,6 +285,7 @@ class IrisRemote(Remote):
     try:
       await super().afetch()
       self.last_mac = int(self._json["extra"]["gateway_addr"], 16)
+      self.uaa_id = self.mac_to_uaa_id(self.last_mac)
       self.rrh_index = int(self._json["global"]["message_index"]) - 1
       self.chain_index = int(self._json["global"]["chain_index"])
       if self.rrh_index >= 0:
