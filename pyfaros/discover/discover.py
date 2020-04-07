@@ -322,7 +322,7 @@ class IrisRemote(Remote):
                                                  self.firmware, self.fpga)
 
   def __str__(self):
-    return "{}:{}".format(self.rrh_index if self.rrh_index >= 0 else "",
+    return "{}:{}".format(self.rrh_index+1 if self.rrh_index >= 0 else "",
                           self.details())
 
 
@@ -708,7 +708,7 @@ class Discover:
             t.create_node(iris_list, parent=thischainidx)
           else:
             for j in [irises[k] for k in sorted(irises.keys())]:
-              t.create_node("Iris {}".format(str(j)), c(), parent=thischainidx)
+              t.create_node("Iris {}".format(str(j+1)), c(), parent=thischainidx)
 
     if self._standalone_irises:
       standalone = c()

@@ -9,7 +9,8 @@ from pyfaros.discover.discover import Discover
 __discover_description = """\
 Discover Skylark Wireless network topologies
 
-NOTE: RRH Chain index starts at 1.
+RRH Chain index starts at 1.
+RRH Iris node index starts at 1.
 """
 
 filtermapping = {
