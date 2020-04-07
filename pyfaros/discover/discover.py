@@ -708,7 +708,7 @@ class Discover:
             t.create_node(iris_list, parent=thischainidx)
           else:
             for j in [irises[k] for k in sorted(irises.keys())]:
-              t.create_node("Iris {}".format(str(j+1)), c(), parent=thischainidx)
+              t.create_node("Iris {}".format(str(j)), c(), parent=thischainidx)
 
     if self._standalone_irises:
       standalone = c()
