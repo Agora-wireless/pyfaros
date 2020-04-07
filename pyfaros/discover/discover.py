@@ -666,7 +666,9 @@ class Discover:
     for hub in self._hubs:
       thishubidx = c()
       t.create_node(
-          "Hub: {}    {}".format(hub.serial, hub.address),
+          "Hub: {}    {} - FW: {} FPGA: {}".format(hub.serial, hub.address,
+          getattr(hub, "firmware", ""),
+          getattr(hub, "fpga", "")),
           thishubidx,
           parent=first_node)
       for (chidx,
