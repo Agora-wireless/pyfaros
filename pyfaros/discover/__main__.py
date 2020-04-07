@@ -6,6 +6,12 @@ import sys
 import logging
 from pyfaros.discover.discover import Discover
 
+__discover_description = """\
+Discover Skylark Wireless network topologies
+
+NOTE: RRH Chain index starts at 1.
+"""
+
 filtermapping = {
     str(f).lower().replace("_", "-"): getattr(Discover.Filters, f)
     for f in dir(Discover.Filters)
@@ -15,7 +21,8 @@ filtermapping = {
 
 parser = argparse.ArgumentParser(
     prog="python3 -m pyfaros.discover",
-    description="discover Skylark Wireless network topologies")
+    description=__discover_description,
+    formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument(
     "--output",
     choices=["serial", "address"],

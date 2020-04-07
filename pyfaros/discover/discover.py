@@ -675,7 +675,7 @@ class Discover:
           thischainidx = c()
           t.create_node(
               "Chain {}  Serial {}  Count {}  FW {} FPGA {} {}".format(
-                  chidx, irises.serial, len(list(irises)),
+                  chidx+1, irises.serial, len(list(irises)),
                   self.get_common(irises, 'firmware'),
                   self.get_common(irises, 'fpga'),
                   "(FIX SFP CONFIG)" if not irises.config_correct else ""),
@@ -695,7 +695,7 @@ class Discover:
           thischainidx = c()
           t.create_node(
               "Chain {}  Count: {} FW {} FPGA {}  (Not RRH)".format(
-                  chidx, len(irises),
+                  chidx+1, len(irises),
                   self.get_common(irises.values(), 'firmware'),
                   self.get_common(irises.values(), 'fpga')),
               thischainidx,
