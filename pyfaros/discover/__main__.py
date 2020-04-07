@@ -55,21 +55,21 @@ parser.add_argument(
 parsed = parser.parse_args()
 
 if parsed.debug:
-  logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.DEBUG)
 else:
-  logging.basicConfig(level=logging.ERROR)
+    logging.basicConfig(level=logging.ERROR)
 
 top = Discover(soapy_enumerate_iterations=1, output=parsed.output)
 if parsed.flat:
-  iteration = sorted(
-      top, key=Discover.Sortings.POWER_DEPENDENCY
-  ) if parsed.sort else top if parsed.filter is None else filter(
-      filtermapping[parsed.filter], top)
-  for i in iteration:
-    if parsed.output:
-      print(eval("i.{}".format(parsed.output)))
-    else:
-      print(str(i))
+    iteration = sorted(
+        top, key=Discover.Sortings.POWER_DEPENDENCY
+    ) if parsed.sort else top if parsed.filter is None else filter(
+        filtermapping[parsed.filter], top)
+    for i in iteration:
+        if parsed.output:
+            print(eval("i.{}".format(parsed.output)))
+        else:
+            print(str(i))
 else:
-  print(top)
+    print(top)
 sys.exit(0)
