@@ -352,6 +352,8 @@ class RRH:
         self.head = heads[0] if heads else None
         self.address = self.head.address if self.head else None
         self.hub = hub
+        sfp_info = getattr(self.head, '_json', {}).get("sfp", {}) \
+            if self.head else {}
         sfp_info = self.head._json["sfp"]
         if sfp_info == "None":
             sfp_info = {}
