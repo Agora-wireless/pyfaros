@@ -106,7 +106,7 @@ class ImageUB(UpdateFile):
 
     def __init__(self, path, manifest=None, variant_given=None):
         super().__init__(path, manifest=manifest, variant_given=variant_given)
-        if isinstance(variant_given, CPERemote.Variant):
+        if isinstance(variant_given, CPERemote.Variant) or isinstance(variant_given, VgerRemote.Variant):
             self.remote_name = "sklk_cpe_image.ub"
         else:
             self.remote_name = "image.ub"
