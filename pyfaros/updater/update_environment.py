@@ -196,9 +196,6 @@ class UpdateEnvironment:
             if not isinstance(item, Remote):
                 return False
             else:
-                if item.variant in [HubRemote.Variant.REVB,]:
-                    # Cannot support patching REVB hubs
-                    return False
                 if item.variant in self.mapping.keys():
                     if self.bootbin_only and (self.mapping[item.variant].bootbin is None):
                         return False

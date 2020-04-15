@@ -39,7 +39,6 @@ class _RemoteEnum(Enum):
     def __repr__(self):
         return self.__qualname__.split('.')[0].replace('Remote', '') + "Variant"
 
-
 class Remote:
     @classmethod
     def mac_to_uaa_id(cls, mac):
@@ -246,6 +245,8 @@ class IrisRemote(Remote):
         RRH = "iris030_rrh"
         UE = "iris030_ue"
         STANDARD = "iris030"
+    Variant.UE.support_from = False
+    Variant.UE.support_to = False
 
     def __init__(self, soapy_dict, loop=None):
         super().__init__(soapy_dict, loop=loop)
@@ -403,8 +404,13 @@ class RRH:
 class HubRemote(Remote):
 
     class Variant(_RemoteEnum):
-        REVA = "faroshub04"
-        REVB = "faroshub04b"
+        HUB = "hub"
+        SOM6 = "som6"
+        SOM9 = "som9"
+
+    Variant.HUB.support_from = False
+    Variant.SOM6.support_to = False
+    Variant.SOM9.support_to = False
 
     def __setitem__(self, key, value):
         """
@@ -446,9 +452,7 @@ class HubRemote(Remote):
         # ie: ab:cd:ef -> 0xefcdab
         self.macmatches = []
         # FIXME: we should inject revision into self.fpga instead.
-        self.variant = (
-            HubRemote.Variant.REVB
-            if "B" is self.revision[-1] else HubRemote.Variant.REVA)
+        self.variant = HubRemote.Variant.HUB
         self.chains = OrderedDict()
 
     def _map_irises(self, irises):

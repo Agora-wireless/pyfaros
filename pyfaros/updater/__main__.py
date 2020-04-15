@@ -54,13 +54,26 @@ if __name__ == '__main__':
         action="store_true",
         default=False)
 
+    extra_helps = {
+        "hub:som6": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
+        "hub:som9": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
+    }
     for device in [IrisRemote, CPERemote, HubRemote, VgerRemote]:
         for v1 in device.Variant:
+            if not getattr (v1, 'support_to', True):
+                continue
             for v2 in device.Variant:
-                if v2 is not v1:
+                if v2 is not v1 and getattr (v2, 'support_from', True):
+                    extra_help = extra_helps.get("{}:{}".format(v1.value, v2.value), "")
+                    devname = device.__name__.strip("Remote")
+                    devname_pl = devname + ("es" if devname.endswith('s') else "s")
+                    help_str = "For {} currently on a {} image, apply a {} image.{}".format(
+                        devname_pl, v1.value, v2.value, extra_help)
+                    if not getattr(v1, 'support_from', True):
+                        help_str = "Apply the {} image to the {}.{}".format(v2.value, v1.value, extra_help)
                     parser.add_argument(
                         '--treat-{}-as-{}'.format(v1.value, v2.value),
-                        help="For {}s, treat devices on {} images as if they're on {} images".format(device.__name__, v1, v2),
+                        help=help_str,
                         action="store_true",
                         default=False)
 
@@ -101,8 +114,10 @@ if __name__ == '__main__':
             logging.debug("Looking for remaps, and remapping")
             for device in [IrisRemote, CPERemote, HubRemote, VgerRemote]:
                 for v1 in device.Variant:
+                    if not getattr (v1, 'support_to', True):
+                        continue
                     for v2 in device.Variant:
-                        if v2 is not v1:
+                        if v2 is not v1 and getattr (v2, 'support_from', True):
                             remap_wanted = eval('args.treat_{}_as_{}'.format(v1.value, v2.value))
                             if remap_wanted:
                                 logging.debug("Did remap for {} to {}".format(v1.value, v2.value))
