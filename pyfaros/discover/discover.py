@@ -449,8 +449,10 @@ class HubRemote(Remote):
         # If you don't get it, just don't worry about it.
         # ie: ab:cd:ef -> 0xefcdab
         self.macmatches = []
-        # FIXME: we should inject revision into self.fpga instead.
-        self.variant = HubRemote.Variant.HUB
+        self.variant = {
+            "zu6eg": HubRemote.Variant.SOM6,
+            "zu9eg": HubRemote.Variant.SOM9,
+        }.get(soapy_dict.get("som", None), HubRemote.Variant.HUB)
         self.chains = OrderedDict()
 
     def _map_irises(self, irises):

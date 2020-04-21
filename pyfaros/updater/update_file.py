@@ -90,9 +90,12 @@ class UpdateFile:
                     if v_family is IrisRemote.Variant:
                         v_specific = IrisRemote.Variant.UE if "ue" in run2.stdout else IrisRemote.Variant.RRH if "rrh" in run2.stdout else IrisRemote.Variant.STANDARD if "iris030" in run2.stdout else None
                     elif v_family is HubRemote.Variant:
-                        v_specific = HubRemote.Variant.SOM9 if "faroshub04b" in str(
-                            run2.stdout
-                        ) else HubRemote.Variant.SOM6 if "faroshub04" in run2.stdout else None
+                        if "-faroshub04b-" in run2.stdout or "-faroshub04_somzu9eg-" in run2.stdout:
+                            v_specific = HubRemote.Variant.SOM9
+                        elif "-faroshub04-" in run2.stdout or "-faroshub04_somzu6eg-" in run2.stdout:
+                            v_specific = HubRemote.Variant.SOM6
+                        else:
+                            v_specific = None
                     elif v_family is CPERemote.Variant:
                         v_specific = CPERemote.Variant.STANDARD
                     elif v_family is VgerRemote.Variant:
