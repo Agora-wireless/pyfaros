@@ -149,7 +149,6 @@ class Remote:
 class CPERemote(Remote):
 
     class Variant(_RemoteEnum):
-        RRH = "cpe_rrh"
         STANDARD = "cpe"
 
     def __init__(self, soapy_dict, loop=None):
@@ -164,8 +163,7 @@ class CPERemote(Remote):
             self.address = "[" + self.address + "]"
         self._json_url = url._replace(scheme="http", netloc=self.address).geturl()
         self.variant = (
-            CPERemote.Variant.RRH
-            if "rrh" in self.fpga else CPERemote.Variant.STANDARD)
+            CPERemote.Variant.STANDARD)
         # After e2400b4a9647f633086d1088b61460c03e79f616 is merged into sklk-dev, we can check device type.
         # https://gitlab.com/skylark-wireless/software/sklk-dev/-/merge_requests/94
 

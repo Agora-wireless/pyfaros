@@ -94,9 +94,7 @@ class UpdateFile:
                             run2.stdout
                         ) else HubRemote.Variant.SOM6 if "faroshub04" in run2.stdout else None
                     elif v_family is CPERemote.Variant:
-                        v_specific = CPERemote.Variant.RRH if "cpe_rrh" in str(
-                            run2.stdout
-                        ) else CPERemote.Variant.STANDARD if "cpe" in run2.stdout else None
+                        v_specific = CPERemote.Variant.STANDARD
                     elif v_family is VgerRemote.Variant:
                         v_specific = VgerRemote.Variant.VGER
         return (v_family, v_specific)
