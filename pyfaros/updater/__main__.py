@@ -5,52 +5,77 @@ import argparse
 import asyncio
 import logging
 from pyfaros.updater.updater import do_update
-from pyfaros.updater.update_file import UpdateFile
 from pyfaros.updater.update_environment import UpdateEnvironment
-import pyfaros.discover
 from pyfaros.discover.discover import Discover, CPERemote, IrisRemote, HubRemote, VgerRemote
+import pkg_resources
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
             prog="python3 -m pyfaros.updater",
-            description="Update Skylark Wireless Devices")
+            description="Update Skylark Wireless Devices",
+            add_help=False)
+
     parser.add_argument(
-        '--debug', help="turn on debug messages", action="store_true")
-    parser.add_argument(
-        '--universal',
+        'serial', help="Serials to patch", nargs="*")
+
+    general_options = parser.add_argument_group("General Options")
+    device_type_options = parser.add_argument_group("Device Type Override Options")
+    advanced_options = parser.add_argument_group("Advanced Options")
+
+    general_options.add_argument(
+        '-d', '--debug', help="turn on debug messages", action="store_true")
+    general_options.add_argument(
+        '-u', '--universal',
         help="Path to universal tarball",
         action="store",
         default=None)
-    parser.add_argument(
+    general_options.add_argument(
+        '-n', '--dry-run',
+        help="Don't actuall do the update.",
+        action="store_true",
+        default=False)
+    general_options.add_argument(
+        "-v", "--version",
+        action="version",
+        #version="pyfaros-{}".format(dir(pyfaros)),
+        version="pyfaros-{}".format(pkg_resources.get_distribution("pyfaros").version),
+        help="Displays the version and then exits.",
+    )
+    general_options.add_argument(
+        "-h", "--help",
+        action="help",
+        default=argparse.SUPPRESS,
+        help="Displays this help message and then exits.",
+    )
+
+    advanced_options.add_argument(
         '--bootbit-only',
-        help="Only update bootbit, no other files",
+        help="Only update bootbit, no other files.",
         action="store_true",
         default=False)
-    parser.add_argument(
+    advanced_options.add_argument(
         '--imageub-only',
-        help="Only update imageub, no other files",
+        help="Only update imageub, no other files.",
         action="store_true",
         default=False)
-    parser.add_argument(
+    advanced_options.add_argument(
         '--bootbin-only',
         help="Only update bootbin, no other files.",
         action="store_true",
         default=False)
-    parser.add_argument(
+    advanced_options.add_argument(
         '--file',
-        help="Individual tarballs to apply",
+        help="Individual tarballs to apply.",
         action="append",
         default=[])
-    parser.add_argument(
-        '--serial', help="Serials to patch", action="append", default=[])
-    parser.add_argument(
+    advanced_options.add_argument(
         '--standalone',
-        help="Update all standalone iris nodes",
+        help="Update all standalone iris nodes.",
         action="store_true",
         default=False)
-    parser.add_argument(
-        '--dry-run',
-        help="Don't actuall do the update.",
+    advanced_options.add_argument(
+        '--patch-all',
+        help="Patch everything on the network.",
         action="store_true",
         default=False)
 
@@ -71,7 +96,7 @@ if __name__ == '__main__':
                         devname_pl, v1.value, v2.value, extra_help)
                     if not getattr(v1, 'support_from', True):
                         help_str = "Apply the {} image to the {}.{}".format(v2.value, v1.value, extra_help)
-                    parser.add_argument(
+                    device_type_options.add_argument(
                         '--treat-{}-as-{}'.format(v1.value, v2.value),
                         help=help_str,
                         action="store_true",
@@ -129,7 +154,7 @@ if __name__ == '__main__':
                        list(Discover())),
                 key=Discover.Sortings.POWER_DEPENDENCY)
             logging.debug(discovered)
-            if args.serial:
+            if not args.patch_all:
                 discovered = list(filter(lambda x: x.serial in args.serial, discovered))
             elif args.standalone:
                 discovered = list(
