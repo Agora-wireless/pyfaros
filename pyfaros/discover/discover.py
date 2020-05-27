@@ -100,6 +100,7 @@ class Remote:
             yield list(connections)
 
     def __init__(self, soapy_dict, loop=None):
+        self.soapy_dict = soapy_dict
         self.driver = soapy_dict["driver"] if "driver" in soapy_dict else None
         self.firmware = soapy_dict["firmware"] if "firmware" in soapy_dict else None
         self.fpga = soapy_dict["fpga"] if "fpga" in soapy_dict else None
