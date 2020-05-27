@@ -1,8 +1,7 @@
 from __future__ import absolute_import
 import setuptools
-import git
 
-sha = git.Repo(search_parent_directories=True).head.object.hexsha[:8]
+from version import pyfaros_version
 
 # fixme: this excludes SoapySDR
 with open('requirements.txt') as fp:
@@ -10,12 +9,12 @@ with open('requirements.txt') as fp:
 
 setuptools.setup(
     name="pyfaros",
-    version="0.0.4-{}".format(sha),
+    version=pyfaros_version,
     author="Skylark Wireless",
     description="discover/update skylark wireless devices",
     url="https://gitlab.com/skylark-wireless/software/sklk-utils/",
     packages=setuptools.find_packages(),
-    data_files=[('.',['requirements.txt']), ],
+    data_files=[('.',['requirements.txt']), ('.',['version.py'])],
     install_requires=install_requires,
     python_requires='>=3.6',
 )
