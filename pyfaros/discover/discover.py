@@ -322,7 +322,10 @@ class IrisRemote(Remote):
                                                    self.firmware, self.fpga)
 
     def __str__(self):
-        return "{}:{}".format(self.rrh_index+1 if self.rrh_index >= 0 else "",
+        index = getattr(self, "rrh_index", -1)
+        if index is None:
+            index = -1
+        return "{}:{}".format(index + 1 if index >= 0 else "",
                               self.details())
 
 
@@ -773,12 +776,14 @@ class Discover:
                   item is not power-dependent on the prior.
                   """
             if isinstance(item, IrisRemote):
-                if item.rrh_index is not None:
-                    return 0 - item.rrh_index
-                return 0
+                index = getattr(item, "rrh_index", 0) or 0
+                chain = getattr(item, "chain_index", 0) or 0
+                value = [0 - chain, 0 - index]
             elif isinstance(item, HubRemote):
-                return 1
-            return 2
+                value = [1, 0]
+            else:
+                value = [2, 0]
+            return value
 
     class Filters:
         # Please maintain item1 as a parameter to filters returning filters and

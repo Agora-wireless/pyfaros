@@ -153,7 +153,7 @@ if __name__ == '__main__':
                 filter(update_environment.availablefilter(),
                        list(Discover())),
                 key=Discover.Sortings.POWER_DEPENDENCY)
-            logging.debug(discovered)
+            logging.debug("Discovered objects: {}".format(discovered))
             if not args.patch_all:
                 discovered = list(filter(lambda x: x.serial in args.serial, discovered))
             elif args.standalone:
@@ -162,7 +162,7 @@ if __name__ == '__main__':
                         lambda x: x.rrh is None,
                         filter(lambda x: isinstance(x, IrisRemote),
                                discovered)))
-            logging.debug(discovered)
+            logging.debug("Filtered discovered objects: {}".format(discovered))
             logging.info("About to flash devices:")
             for device in discovered:
                 logging.info("\t {} - {}\n\t\t{}\n\t\t{}\n\t\t{}".format(
