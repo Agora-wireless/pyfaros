@@ -146,6 +146,15 @@ class Remote:
     def __iter__(self):
         raise NotImplementedError
 
+    def _try_get_json(self, *fields):
+        for field in fields:
+            try:
+                return self._json[field]
+            except KeyError:
+                continue
+
+        raise KeyError('Fields {} do not exist in the JSON'.format(fields))
+
 
 class CPERemote(Remote):
 
@@ -284,7 +293,7 @@ class IrisRemote(Remote):
     async def afetch(self):
         try:
             await super().afetch()
-            self.last_mac = int(self._json["sklk_pl_eth"]["gateway_addr"], 16)
+            self.last_mac = int(self._try_get_json('sklk_pl_eth', 'extra')["gateway_addr"], 16)
             self.uaa_id = self.mac_to_uaa_id(self.last_mac)
             self.rrh_index = int(self._json["global"]["message_index"]) - 1
             self.chain_index = int(self._json["global"]["chain_index"])
@@ -488,7 +497,7 @@ class HubRemote(Remote):
             # Get last-3's of macaddress
             self.macmatches = [
                 int("".join(reversed(k[3::])), 16)
-                for k in map(lambda x: x.split(":"), self._json["config"]
+                for k in map(lambda x: x.split(":"), self._try_get_json('jtagblob', 'config')
                              ["network"].values())
             ]
             return self
