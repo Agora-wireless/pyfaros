@@ -529,7 +529,7 @@ class Discover:
       on IO.
       """
 
-    def __init__(self, soapy_enumerate_iterations=3, output=None):
+    def __init__(self, soapy_enumerate_iterations=3, output=None, timeout_ms=800):
         self.time = datetime.datetime.now()
         # Grab an event loop so that we can get all of the json additional
         # information at once.
@@ -539,7 +539,7 @@ class Discover:
         soapy_enumerations = {}
         for _ in range(0, soapy_enumerate_iterations):
             for found in map(dict,
-                             SoapySDR.Device.enumerate(str(dict(timeoutUs=8e5)))):
+                             SoapySDR.Device.enumerate(str(dict(timeoutUs=timeout_ms * 1000)))):
                 if "serial" in found and found["serial"] not in soapy_enumerations:
                     soapy_enumerations[found["serial"]] = found
             time.sleep(1)
