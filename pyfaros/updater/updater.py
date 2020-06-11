@@ -15,6 +15,10 @@ from pyfaros.updater.update_environment import UpdateEnvironment
 log = logging.getLogger(__name__)
 
 
+class UpdateError(Exception):
+    pass
+
+
 async def transfer_files(device, file_list, tmpdir):
     mkdir_cmd = "mkdir /tmp/updater_{}".format(tmpdir)
     try:
@@ -57,7 +61,7 @@ async def mount_boot(device):
         if "/boot" in current_mounts.stdout:
             await device.ssh_connection.run(
                 "sudo -n /bin/umount /boot", term_type='xterm', check=True)
-        #await device.ssh_connection.run("sudo -n /sbin/fsck -a -w /dev/mmcblk0p1", term_type='xterm', check=True)
+        # await device.ssh_connection.run("sudo -n /sbin/fsck -a -w /dev/mmcblk0p1", term_type='xterm', check=True)
         await device.ssh_connection.run(
             "sudo -n /bin/mount /boot -o rw", term_type='xterm', check=True)
         logging.debug("{} - fsck'd and boot mounted".format(device.serial))
@@ -86,7 +90,7 @@ async def replace_files(device, file_list, tmpdir):
             "sudo -n /bin/sync", check=True, term_type='xterm')
         await device.ssh_connection.run(
             "sudo -n /bin/umount /boot", check=True, term_type='xterm')
-        #await device.ssh_connection.run("sudo -n /sbin/fsck -a -w /dev/mmcblk0p1", check=True, term_type='xterm')
+        # await device.ssh_connection.run("sudo -n /sbin/fsck -a -w /dev/mmcblk0p1", check=True, term_type='xterm')
         return True
     except Exception as e:
         logging.debug("{} - {} - {}".format(device, "sudo -n /bin/sync", e))
@@ -102,41 +106,49 @@ async def do_reboot(device):
 async def do_update(context, devices):
     this_update_timestamp = str(time.time()).split('.')[0]
     async with Remote.sshify(devices):
-        try:
-            cmap_list = lambda d: [
-                context.mapping[d.variant].bootbin,
-                context.mapping[d.variant].imageub
-            ] if (isinstance(d, IrisRemote) or isinstance(
-                d, HubRemote)) else [
-                    context.mapping[d.variant].bootbit,
-                    context.mapping[d.variant].imageub
-                ]
+        cmap_list = lambda d: [
+            context.mapping[d.variant].bootbin,
+            context.mapping[d.variant].imageub
+        ] if (isinstance(d, IrisRemote) or isinstance(
+            d, HubRemote)) else [
+            context.mapping[d.variant].bootbit,
+            context.mapping[d.variant].imageub
+        ]
 
-            copy_results = await asyncio.gather(
-                *[
-                    transfer_files(d, cmap_list(d), this_update_timestamp)
-                    for d in devices
-                ],
-                return_exceptions=True)
-            logging.debug(copy_results)
-            if reduce(lambda x, y: x and y, copy_results, True) is not True:
-                sys.exit(1)
-            mount_exceptions = await asyncio.gather(
-                *[mount_boot(d) for d in devices], return_exceptions=True)
-            logging.debug(mount_exceptions)
-            if reduce(lambda x, y: x and y, copy_results, True) is not True:
-                sys.exit(1)
-            replace_exceptions = await asyncio.gather(
-                *[
-                    replace_files(d, cmap_list(d), this_update_timestamp)
-                    for d in devices
-                ],
-                return_exceptions=True)
-            logging.debug(replace_exceptions)
-            if reduce(lambda x, y: x and y, copy_results, True) is not True:
-                sys.exit(1)
-        except Exception as e:
-            logging.debug(e)
-            sys.exit(1)
+        copy_exceptions = await asyncio.gather(
+            *[
+                transfer_files(d, cmap_list(d), this_update_timestamp)
+                for d in devices
+            ],
+            return_exceptions=True)
+
+        copy_exceptions = [e for e in copy_exceptions if isinstance(e, Exception)]
+        logging.debug(copy_exceptions)
+
+        if len(copy_exceptions) > 0:
+            raise UpdateError(copy_exceptions)
+
+        mount_exceptions = await asyncio.gather(
+            *[mount_boot(d) for d in devices], return_exceptions=True)
+
+        mount_exceptions = [e for e in mount_exceptions if isinstance(e, Exception)]
+        logging.debug(mount_exceptions)
+
+        if len(mount_exceptions) > 0:
+            raise UpdateError(mount_exceptions)
+
+        replace_exceptions = await asyncio.gather(
+            *[
+                replace_files(d, cmap_list(d), this_update_timestamp)
+                for d in devices
+            ],
+            return_exceptions=True)
+        
+        replace_exceptions = [e for e in replace_exceptions if isinstance(e, Exception)]
+        logging.debug(replace_exceptions)
+
+        if len(replace_exceptions) > 0:
+            raise UpdateError(replace_exceptions)
+
         for device in devices:
             await do_reboot(device)
