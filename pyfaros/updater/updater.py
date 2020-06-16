@@ -59,7 +59,7 @@ async def mount_boot(device):
                 "sudo -n /bin/umount /boot", term_type='xterm', check=True)
         #await device.ssh_connection.run("sudo -n /sbin/fsck -a -w /dev/mmcblk0p1", term_type='xterm', check=True)
         await device.ssh_connection.run(
-            "sudo -n /bin/mount /boot", term_type='xterm', check=True)
+            "sudo -n /bin/mount /boot -o rw", term_type='xterm', check=True)
         logging.debug("{} - fsck'd and boot mounted".format(device.serial))
         return True
     except Exception as e:
