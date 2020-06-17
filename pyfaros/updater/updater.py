@@ -177,6 +177,7 @@ async def wait_for_devices(devices: Iterable[Remote], interval: int, timeout: in
 
     while time.time() - start <= timeout:
         if await find_devices(devices):
+            log.info('Found devices after the update!')
             return True
 
         await asyncio.sleep(interval)
@@ -191,4 +192,7 @@ async def do_update_and_wait(context: UpdateEnvironment, devices: Iterable[Remot
     Devices are polled at an interval of `interval` seconds.
     """
     await do_update(context, devices)
+
+    log.info('Devices updated. Waiting for them to reappear on the network...')
+
     return await wait_for_devices(devices, interval, timeout)
