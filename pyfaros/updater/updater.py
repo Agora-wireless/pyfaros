@@ -8,7 +8,11 @@ import pprint
 import sys
 import time
 from functools import reduce
+
+import SoapySDR
 import asyncssh
+from typing import Iterable
+
 from pyfaros.discover.discover import Discover, Remote, IrisRemote, HubRemote
 from pyfaros.updater.update_environment import UpdateEnvironment
 
@@ -152,3 +156,39 @@ async def do_update(context, devices):
 
         for device in devices:
             await do_reboot(device)
+
+
+def find_device(device: Remote) -> bool:
+    for found_dict in SoapySDR.Device.enumerate(device.soapy_dict):
+        if 'serial' in found_dict and found_dict['serial'] == device.serial:
+            return True
+    return False
+
+
+async def find_devices(devices: Iterable[Remote]) -> bool:
+    async def find_device_async(device: Remote) -> bool:
+        return await asyncio.get_event_loop().run_in_executor(None, find_device, device)
+
+    return all(await asyncio.gather(*map(find_device_async, devices)))
+
+
+async def wait_for_devices(devices: Iterable[Remote], interval: int, timeout: int) -> bool:
+    start = time.time()
+
+    while time.time() - start <= timeout:
+        if await find_devices(devices):
+            return True
+
+        await asyncio.sleep(interval)
+
+    return False
+
+
+async def do_update_and_wait(context: UpdateEnvironment, devices: Iterable[Remote],
+                             interval: int, timeout: int) -> bool:
+    """
+    Returns True if the devices are found within `timeout` seconds after the update, False otherwise.
+    Devices are polled at an interval of `interval` seconds.
+    """
+    await do_update(context, devices)
+    return await wait_for_devices(devices, interval, timeout)
