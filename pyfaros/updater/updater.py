@@ -158,18 +158,17 @@ async def do_update(context, devices):
             await do_reboot(device)
 
 
-def find_device(device: Remote) -> bool:
-    for found_dict in SoapySDR.Device.enumerate(device.soapy_dict):
-        if 'serial' in found_dict and found_dict['serial'] == device.serial:
-            return True
-    return False
-
-
 async def find_devices(devices: Iterable[Remote]) -> bool:
-    async def find_device_async(device: Remote) -> bool:
-        return await asyncio.get_event_loop().run_in_executor(None, find_device, device)
+    found_devices = await asyncio.get_event_loop().run_in_executor(None, SoapySDR.Device.enumerate)
 
-    return all(await asyncio.gather(*map(find_device_async, devices)))
+    def find(device: Remote):
+        for found_dict in found_devices:
+            if 'serial' in found_dict and found_dict['serial'] == device.serial:
+                log.info('Found device {}'.format(device.serial))
+                return True
+        return False
+
+    return all(find(device) for device in devices)
 
 
 async def wait_for_devices(devices: Iterable[Remote], interval: int, timeout: int) -> bool:
@@ -177,9 +176,10 @@ async def wait_for_devices(devices: Iterable[Remote], interval: int, timeout: in
 
     while time.time() - start <= timeout:
         if await find_devices(devices):
-            log.info('Found devices after the update!')
+            log.info('Found all devices after the update!')
             return True
 
+        log.info('Unable to find all devices, retrying after {} seconds...'.format(interval))
         await asyncio.sleep(interval)
 
     return False

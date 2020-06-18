@@ -4,10 +4,22 @@ import sys
 import argparse
 import asyncio
 import logging
-from pyfaros.updater.updater import do_update
+from typing import Iterable
+
+from pyfaros.updater.updater import do_update, do_update_and_wait
 from pyfaros.updater.update_environment import UpdateEnvironment
-from pyfaros.discover.discover import Discover, CPERemote, IrisRemote, HubRemote, VgerRemote
+from pyfaros.discover.discover import Discover, CPERemote, IrisRemote, HubRemote, VgerRemote, Remote
 import pkg_resources
+
+
+async def update_devices(environment: UpdateEnvironment, devices: Iterable[Remote], args) -> None:
+    timeout = args.timeout
+    if timeout == 0:
+        await do_update(environment, devices)
+    else:
+        if not await do_update_and_wait(environment, devices, 15, timeout):
+            logging.error('Failed to reach devices within {} seconds after reboot'.format(timeout))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -46,6 +58,12 @@ if __name__ == '__main__':
         action="help",
         default=argparse.SUPPRESS,
         help="Displays this help message and then exits.",
+    )
+
+    general_options.add_argument(
+        '-t', '--timeout',
+        type=int, default=300,
+        help='The maximum duration (in seconds) to wait for the devices to come back online.',
     )
 
     advanced_options.add_argument(
@@ -172,7 +190,7 @@ if __name__ == '__main__':
                     update_environment.mapping[device.variant].imageub))
             if not args.dry_run:
                 loop = asyncio.get_event_loop()
-                loop.run_until_complete(do_update(update_environment, discovered))
+                loop.run_until_complete(update_devices(update_environment, discovered, args))
                 loop.close()
     except Exception as e:
         logging.debug(e)
