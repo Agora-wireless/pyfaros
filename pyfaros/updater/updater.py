@@ -193,6 +193,7 @@ async def do_update_and_wait(context: UpdateEnvironment, devices: Iterable[Remot
     """
     await do_update(context, devices)
 
+    await asyncio.sleep(interval)
     log.info('Devices updated. Waiting for them to reappear on the network...')
 
     return await wait_for_devices(devices, interval, timeout)
