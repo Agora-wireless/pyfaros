@@ -366,7 +366,7 @@ class RRH:
         self.hub = hub
         sfp_info = getattr(self.head, '_json', {}).get("sfp", {}) \
             if self.head else {}
-        if sfp_info == "None":
+        if sfp_info == "None" or sfp_info is None:
             sfp_info = {}
         self.config = sfp_info.get("config", {}).get("rrh", None) if self.head else None
         if self.config is None:
