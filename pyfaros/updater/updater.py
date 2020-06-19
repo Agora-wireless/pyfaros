@@ -179,7 +179,10 @@ async def wait_for_devices(devices: Iterable[Remote], interval: int, timeout: in
             log.info('Found all devices after the update!')
             return True
 
-        log.info('Unable to find all devices, retrying after {} seconds...'.format(interval))
+        # Only cause for concern if it starts taking more than a minute
+        if time.time() - start >= 60:
+            log.info('Unable to find all devices, retrying after {} seconds...'.format(interval))
+
         await asyncio.sleep(interval)
 
     return False
