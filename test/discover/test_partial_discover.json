@@ -1,0 +1,1378 @@
+{
+    "status": {
+        "0306": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0306",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:02:77",
+                    "gtxdn": "38:3a:21:90:02:79",
+                    "gtxup": "38:3a:21:90:02:78"
+                },
+                "revision": "b",
+                "serial": "0306"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 6,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 4,
+                "chain_index": 1
+            }
+        },
+        "0256": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0256",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:02:8b",
+                    "gtxdn": "38:3a:21:90:02:90",
+                    "gtxup": "38:3a:21:90:02:8f"
+                },
+                "revision": "b",
+                "serial": "0256"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 6,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 8,
+                "chain_index": 1
+            }
+        },
+        "0395": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0395",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:02:5b",
+                    "gtxdn": "38:3a:21:90:00:5d",
+                    "gtxup": "38:3a:21:90:00:5c"
+                },
+                "revision": "b",
+                "serial": "0395"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 6,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 2,
+                "chain_index": 1
+            }
+        },
+        "0257": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0257",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:03:65",
+                    "gtxdn": "38:3a:21:90:03:67",
+                    "gtxup": "38:3a:21:90:03:66"
+                },
+                "revision": "b",
+                "serial": "0257"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 6,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 5,
+                "chain_index": 1
+            }
+        },
+        "0312": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0312",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:02:d8",
+                    "gtxdn": "38:3a:21:90:02:da",
+                    "gtxup": "38:3a:21:90:02:d9"
+                },
+                "revision": "b",
+                "serial": "0312"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 6,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 7,
+                "chain_index": 1
+            }
+        },
+        "0233": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0233",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:02:a3",
+                    "gtxdn": "38:3a:21:90:02:a5",
+                    "gtxup": "38:3a:21:90:02:a4"
+                },
+                "revision": "b",
+                "serial": "0233"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 5,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 6,
+                "chain_index": 0
+            }
+        },
+        "0181": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 7,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 2,
+                "chain_index": 2
+            }
+        },
+        "0198": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 7,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 5,
+                "chain_index": 2
+            }
+        },
+        "0344": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 7,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 6,
+                "chain_index": 2
+            }
+        },
+        "0209": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0209",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:03:36",
+                    "gtxdn": "38:3a:21:90:03:38",
+                    "gtxup": "38:3a:21:90:03:37"
+                },
+                "revision": "b",
+                "serial": "0209"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 6,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 6,
+                "chain_index": 1
+            }
+        },
+        "0217": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0217",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:01:72",
+                    "gtxdn": "38:3a:21:90:01:74",
+                    "gtxup": "38:3a:21:90:01:73"
+                },
+                "revision": "b",
+                "serial": "0217"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 6,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 3,
+                "chain_index": 1
+            }
+        },
+        "0236": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 8,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 6,
+                "chain_index": 3
+            }
+        },
+        "0316": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 7,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 8,
+                "chain_index": 2
+            }
+        },
+        "0329": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 8,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 3,
+                "chain_index": 3
+            }
+        },
+        "0397": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 7,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 3,
+                "chain_index": 2
+            }
+        },
+        "RF3E000548": {
+            "sfp": {
+                "config": {
+                    "label": "IRIS-EXT-01-SFP-D - EX1D000031",
+                    "model": "IRIS-EXT-01-SFP",
+                    "revision": "d",
+                    "serial": "EX1D000031"
+                }
+            },
+            "config": {
+                "label": "IRIS-030E - RF3E000548",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:05:c2"
+                },
+                "revision": "e",
+                "serial": "RF3E000548"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 11,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 1,
+                "chain_index": 6
+            }
+        },
+        "0231": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0231",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:01:ad",
+                    "gtxdn": "38:3a:21:90:01:af",
+                    "gtxup": "38:3a:21:90:01:ae"
+                },
+                "revision": "b",
+                "serial": "0231"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 5,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 8,
+                "chain_index": 0
+            }
+        },
+        "0270": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 7,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 4,
+                "chain_index": 2
+            }
+        },
+        "RF3E000111": {
+            "sfp": {
+                "config": {
+                    "label": "IRIS-EXT-01-SFP-D - EX1D000065",
+                    "model": "IRIS-EXT-01-SFP",
+                    "revision": "d",
+                    "rrh": {
+                        "chain": [
+                            "RF3E000111",
+                            "0390",
+                            "0329",
+                            "0291",
+                            "0293",
+                            "0236",
+                            "0353",
+                            "0380"
+                        ],
+                        "label": "FAROS-ENC-04-RRH-UHF-B - RH4B000003",
+                        "model": "FAROS-ENC-04-RRH-UHF",
+                        "revision": "b",
+                        "serial": "RH4B000003"
+                    },
+                    "serial": "EX1D000065"
+                }
+            },
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 8,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 1,
+                "chain_index": 3
+            }
+        },
+        "RF3E000253": {
+            "sfp": {
+                "config": {
+                    "label": "IRIS-EXT-01-SFP-D - EX1D000036",
+                    "model": "IRIS-EXT-01-SFP",
+                    "revision": "d",
+                    "rrh": {
+                        "chain": [
+                            "RF3E000253",
+                            "0395",
+                            "0217",
+                            "0306",
+                            "0257",
+                            "0209",
+                            "0312",
+                            "0256"
+                        ],
+                        "label": "FAROS-ENC-04-RRH-UHF-B - RH4B000034",
+                        "model": "FAROS-ENC-04-RRH-UHF",
+                        "revision": "b",
+                        "serial": "RH4B000034"
+                    },
+                    "serial": "EX1D000036"
+                }
+            },
+            "config": {
+                "label": "IRIS-030E - RF3E000253",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:04:a1"
+                },
+                "revision": "e",
+                "serial": "RF3E000253"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 6,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 1,
+                "chain_index": 1
+            }
+        },
+        "0243": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0243",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:02:b4",
+                    "gtxdn": "38:3a:21:90:02:bc",
+                    "gtxup": "38:3a:21:90:02:b8"
+                },
+                "revision": "b",
+                "serial": "0243"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 5,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 5,
+                "chain_index": 0
+            }
+        },
+        "0353": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 8,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 7,
+                "chain_index": 3
+            }
+        },
+        "RF3E000170": {
+            "sfp": {
+                "config": {
+                    "label": "IRIS-EXT-01-SFP-D - EX1D000035",
+                    "model": "IRIS-EXT-01-SFP",
+                    "revision": "d",
+                    "rrh": {
+                        "chain": [
+                            "RF3E000170",
+                            "0181",
+                            "0397",
+                            "0270",
+                            "0198",
+                            "0344",
+                            "0268",
+                            "0316"
+                        ],
+                        "label": "FAROS-ENC-04-RRH-UHF-B - RH4B000033",
+                        "model": "FAROS-ENC-04-RRH-UHF",
+                        "revision": "b",
+                        "serial": "RH4B000033"
+                    },
+                    "serial": "EX1D000035"
+                }
+            },
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 7,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 1,
+                "chain_index": 2
+            }
+        },
+        "0268": {
+            "sfp": "None",
+            "extra": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 7,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 7,
+                "chain_index": 2
+            }
+        },
+        "RF3E000319": {
+            "sfp": {
+                "config": {
+                    "label": "IRIS-EXT-01-SFP-D - EX1D000023",
+                    "model": "IRIS-EXT-01-SFP",
+                    "revision": "d",
+                    "rrh": {
+                        "chain": [
+                            "RF3E000319",
+                            "0219",
+                            "0266",
+                            "0282",
+                            "0243",
+                            "0233",
+                            "0279",
+                            "0231"
+                        ],
+                        "label": "FAROS-ENC-04-RRH-UHF-B - RH4B000029",
+                        "model": "FAROS-ENC-04-RRH-UHF",
+                        "revision": "b",
+                        "serial": "RH4B000029"
+                    },
+                    "serial": "EX1D000023"
+                }
+            },
+            "config": {
+                "label": "IRIS-030E - RF3E000319",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:05:da"
+                },
+                "revision": "e",
+                "serial": "RF3E000319"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 5,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 1,
+                "chain_index": 0
+            }
+        },
+        "0220": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0220",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:00:42",
+                    "gtxdn": "38:3a:21:90:00:44",
+                    "gtxup": "38:3a:21:90:00:43"
+                },
+                "revision": "b",
+                "serial": "0220"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 9,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 3,
+                "chain_index": 4
+            }
+        },
+        "0318": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0318",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:00:26",
+                    "gtxdn": "38:3a:21:90:00:28",
+                    "gtxup": "38:3a:21:90:00:27"
+                },
+                "revision": "b",
+                "serial": "0318"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 9,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 2,
+                "chain_index": 4
+            }
+        },
+        "0338": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0338",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:00:53",
+                    "gtxdn": "38:3a:21:90:00:5b",
+                    "gtxup": "38:3a:21:90:00:54"
+                },
+                "revision": "b",
+                "serial": "0338"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 9,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 8,
+                "chain_index": 4
+            }
+        },
+        "0328": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0328",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:03:96",
+                    "gtxdn": "38:3a:21:90:03:98",
+                    "gtxup": "38:3a:21:90:03:97"
+                },
+                "revision": "b",
+                "serial": "0328"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 9,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 6,
+                "chain_index": 4
+            }
+        },
+        "0334": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0334",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:03:80",
+                    "gtxdn": "38:3a:21:90:03:91",
+                    "gtxup": "38:3a:21:90:03:84"
+                },
+                "revision": "b",
+                "serial": "0334"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 9,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 5,
+                "chain_index": 4
+            }
+        },
+        "0250": {
+            "sfp": null,
+            "config": {
+                "label": "IRIS-030B - 0250",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:01:c3",
+                    "gtxdn": "38:3a:21:90:01:c5",
+                    "gtxup": "38:3a:21:90:01:c4"
+                },
+                "revision": "b",
+                "serial": "0250"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 9,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 4,
+                "chain_index": 4
+            }
+        },
+        "RF3E000336": {
+            "sfp": {
+                "config": {
+                    "label": "IRIS-EXT-01-SFP-D - EX1D000013",
+                    "model": "IRIS-EXT-01-SFP",
+                    "revision": "d",
+                    "rrh": {
+                        "chain": [
+                            "RF3E000336",
+                            "0318",
+                            "0220",
+                            "0250",
+                            "0334",
+                            "0328",
+                            "0341",
+                            "0338"
+                        ],
+                        "label": "FAROS-ENC-04-RRH-UHF-B - RH4B000032",
+                        "model": "FAROS-ENC-04-RRH-UHF",
+                        "revision": "b",
+                        "serial": "RH4B000032"
+                    },
+                    "serial": "EX1D000013"
+                }
+            },
+            "config": {
+                "label": "IRIS-030E - RF3E000336",
+                "model": "Iris-030",
+                "network": {
+                    "eth0": "38:3a:21:90:07:29"
+                },
+                "revision": "e",
+                "serial": "RF3E000336"
+            },
+            "sklk_pl_eth": {
+                "gateway_addr": "0x00330390",
+                "gateway_ep": 9,
+                "gateway_tag": 1,
+                "local_tag": 1
+            },
+            "global": {
+                "message_index": 1,
+                "chain_index": 4
+            }
+        },
+        "FH4A000006": {
+            "config": {
+                "label": "FAROS-HUB-04-BP-A - FH4A000006",
+                "model": "FAROS-HUB-04-BP",
+                "network": {
+                    "gem2": "38:3a:21:90:03:2c",
+                    "gem3": "38:3a:21:90:02:ad",
+                    "pl0": "38:3a:21:90:00:aa"
+                },
+                "revision": "a",
+                "serial": "FH4A000006"
+            },
+            "global": {}
+        },
+        "FH4A000003": {
+            "config": {
+                "label": "FAROS-HUB-04-BP-A - FH4A000003",
+                "model": "FAROS-HUB-04-BP",
+                "network": {
+                    "gem2": "38:3a:21:90:01:9d",
+                    "gem3": "38:3a:21:90:02:9d",
+                    "pl0": "38:3a:21:90:02:fc"
+                },
+                "revision": "a",
+                "serial": "FH4A000003"
+            },
+            "global": {}
+        },
+        "FH4A000005": {
+            "config": {
+                "label": "FAROS-HUB-04-BP-A - FH4A000005",
+                "model": "FAROS-HUB-04-BP",
+                "network": {
+                    "gem2": "38:3a:21:90:00:51",
+                    "gem3": "38:3a:21:90:02:d1",
+                    "pl0": "38:3a:21:90:03:33"
+                },
+                "revision": "a",
+                "serial": "FH4A000005"
+            },
+            "global": {}
+        }
+    },
+    "enumerate": [
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000161",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-53-8a69f06",
+            "fpga": "2020.06.1.0-e43224f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0306",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:277%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0306"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000045",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-53-8a69f06",
+            "fpga": "2020.06.1.0-e43224f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0256",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:28b%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0256"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000420",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-53-8a69f06",
+            "fpga": "2020.06.1.0-e43224f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0395",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:25b%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0395"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000100",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-53-8a69f06",
+            "fpga": "2020.06.1.0-e43224f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0257",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:365%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0257"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000404",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-53-8a69f06",
+            "fpga": "2020.06.1.0-e43224f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0312",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:2d8%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0312"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000474",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-69-87fb48a",
+            "fpga": "2020.06.1.0-5575143-dirty-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0233",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:2a3%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0233"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000485",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0181",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:2e4%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0181"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000297",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0198",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:3aa%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0198"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000139",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0344",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:163%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0344"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000080",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-53-8a69f06",
+            "fpga": "2020.06.1.0-e43224f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0209",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:336%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0209"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000251",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-53-8a69f06",
+            "fpga": "2020.06.1.0-e43224f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0217",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:172%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0217"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000455",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0236",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:399%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0236"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000501",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0316",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:b3%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0316"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000407",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0329",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:2cc%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0329"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000155",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0397",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:364%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0397"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000428",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-69-87fb48a",
+            "fpga": "2020.06.1.0-5575143-dirty-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030E - RF3E000548",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:5c2%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030e",
+            "serial": "RF3E000548",
+            "sfpSerial": "EX1D000031",
+            "sfpVersion": "IRIS-EXT-01-SFP-D"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000031",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-69-87fb48a",
+            "fpga": "2020.06.1.0-5575143-dirty-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0231",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:1ad%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0231"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000388",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0270",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:18e%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0270"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000206",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030E - RF3E000111",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:36e%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030e",
+            "serial": "RF3E000111",
+            "sfpSerial": "EX1D000065",
+            "sfpVersion": "IRIS-EXT-01-SFP-D"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000072",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-53-8a69f06",
+            "fpga": "2020.06.1.0-e43224f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030E - RF3E000253",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:4a1%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030e",
+            "serial": "RF3E000253",
+            "sfpSerial": "EX1D000036",
+            "sfpVersion": "IRIS-EXT-01-SFP-D"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000469",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-69-87fb48a",
+            "fpga": "2020.06.1.0-5575143-dirty-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0243",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:2b4%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0243"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000400",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0353",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:156%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0353"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000118",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030E - RF3E000170",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:411%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030e",
+            "serial": "RF3E000170",
+            "sfpSerial": "EX1D000035",
+            "sfpVersion": "IRIS-EXT-01-SFP-D"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000176",
+            "feVersion": "18ded1b",
+            "firmware": "2020.04.0.2-0-7698e2f",
+            "fpga": "2020.04.0.2-7698e2f-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0268",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:68%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0268"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000160",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.1.0-69-87fb48a",
+            "fpga": "2020.06.1.0-5575143-dirty-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030E - RF3E000319",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:5da%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030e",
+            "serial": "RF3E000319",
+            "sfpSerial": "EX1D000023",
+            "sfpVersion": "IRIS-EXT-01-SFP-D"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000427",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.0.1-1-9692512",
+            "fpga": "2020.06.0.1-21e8159-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0220",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:42%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0220"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000142",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.0.1-1-9692512",
+            "fpga": "2020.06.0.1-21e8159-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0318",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:26%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0318"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000059",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.0.1-1-9692512",
+            "fpga": "2020.06.0.1-21e8159-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0338",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:53%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0338"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000188",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.0.1-1-9692512",
+            "fpga": "2020.06.0.1-21e8159-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0328",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:396%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0328"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000200",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.0.1-1-9692512",
+            "fpga": "2020.06.0.1-21e8159-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0334",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:380%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0334"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000211",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.0.1-1-9692512",
+            "fpga": "2020.06.0.1-21e8159-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030B - 0250",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:1c3%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030b",
+            "serial": "0250"
+        },
+        {
+            "driver": "iris",
+            "feSerial": "FE2C000007",
+            "feVersion": "18ded1b",
+            "firmware": "2020.06.0.1-1-9692512",
+            "fpga": "2020.06.0.1-21e8159-rrh",
+            "frontend": "IRIS-FE-02-UHFc EVO",
+            "label": "IRIS-030E - RF3E000336",
+            "remote": "tcp://[fe80::3a3a:21ff:fe90:729%3]:55132",
+            "remote:driver": "iris-arm",
+            "remote:type": "iris",
+            "revision": "Iris-030e",
+            "serial": "RF3E000336",
+            "sfpSerial": "EX1D000013",
+            "sfpVersion": "IRIS-EXT-01-SFP-D"
+        },
+        {
+            "cpld": "cb7c32d",
+            "driver": "remote",
+            "firmware": "2020.06.1.0-70-4d7b30c",
+            "fpga": "2020.06.1.0-4d7b30c",
+            "label": "FAROS-HUB-04-BP-A - FH4A000006",
+            "remote": "tcp://10.0.0.154:55132",
+            "remote:driver": "faros",
+            "remote:type": "faros",
+            "revision": "FAROS-HUB-04-BP-A",
+            "serial": "FH4A000006",
+            "som": "zu6eg"
+        },
+        {
+            "cpld": "d8eacef",
+            "driver": "remote",
+            "firmware": "2020.06.0.1-0-21e8159",
+            "fpga": "2020.06.0.1-21e8159",
+            "label": "FAROS-HUB-04-BP-A - FH4A000003",
+            "remote": "tcp://10.0.0.106:55132",
+            "remote:driver": "faros",
+            "remote:type": "faros",
+            "revision": "FAROS-HUB-04-BP-A",
+            "serial": "FH4A000003",
+            "som": "zu6eg"
+        },
+        {
+            "cpld": "d8eacef",
+            "driver": "remote",
+            "firmware": "2020.06.1.0-72-0acb859-dirty",
+            "fpga": "2020.06.1.0-795c6c2-dirty",
+            "label": "FAROS-HUB-04-BP-A - FH4A000005",
+            "remote": "tcp://10.0.0.100:55132",
+            "remote:driver": "faros",
+            "remote:type": "faros",
+            "revision": "FAROS-HUB-04-BP-A",
+            "serial": "FH4A000005",
+            "som": "zu9eg"
+        }
+    ],
+    "expected_devices": {
+        "hubs": [
+            {
+                "serial": "FH4A000006",
+                "chains": {}
+            },
+            {
+                "serial": "FH4A000003",
+                "chains": {}
+            },
+            {
+                "serial": "FH4A000005",
+                "chains": {
+                    "1": {
+                        "nodes": {
+                            "1": "RF3E000319",
+                            "5": "0243",
+                            "6": "0233",
+                            "8": "0231"
+                        },
+                        "serial": "RH4B000029"
+                    },
+                    "2": {
+                        "nodes": {
+                            "1": "RF3E000253",
+                            "2": "0395",
+                            "3": "0217",
+                            "4": "0306",
+                            "5": "0257",
+                            "6": "0209",
+                            "7": "0312",
+                            "8": "0256"
+                        },
+                        "serial": "RH4B000034"
+                    },
+                    "3": {
+                        "nodes": {
+                            "1": "RF3E000170",
+                            "2": "0181",
+                            "3": "0397",
+                            "4": "0270",
+                            "5": "0198",
+                            "6": "0344",
+                            "7": "0268",
+                            "8": "0316"
+                        },
+                        "serial": "RH4B000033"
+                    },
+                    "4": {
+                        "nodes": {
+                            "1": "RF3E000111",
+                            "3": "0329",
+                            "6": "0236",
+                            "7": "0353"
+                        },
+                        "serial": "RH4B000003"
+                    },
+                    "5": {
+                        "nodes": {
+                            "1": "RF3E000336",
+                            "2": "0318",
+                            "3": "0220",
+                            "4": "0250",
+                            "5": "0334",
+                            "6": "0328",
+                            "8": "0338"
+                        },
+                        "serial": "RH4B000032"
+                    },
+                    "7": {
+                        "nodes": {
+                            "1": "RF3E000548"
+                        }
+                    }
+                }
+            }
+        ],
+        "iris": [],
+        "cpe": [],
+        "vger": []
+    }
+}

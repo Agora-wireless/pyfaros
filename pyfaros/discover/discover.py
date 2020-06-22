@@ -8,6 +8,7 @@ from collections import OrderedDict
 from enum import Enum
 from functools import reduce, partial
 from types import MethodType
+import json
 
 import aiohttp
 import asyncssh
@@ -397,8 +398,10 @@ class RRH:
             ),
             True,
         )
+        # REVISIT: To really be useful, this message needs to only occur when the nodes don't match.
+        # It should not happen when nodes are missing since that is more obvious and somewhat common.
         if not self.config_correct:
-            log.info("RRH config doesn't match discovered topology")
+            log.debug("RRH config doesn't match discovered topology")
         for iris in self.nodes:
             # Map the iris back to us.
             iris.rrh_member = True
@@ -764,6 +767,42 @@ class Discover:
                 t.create_node("VGER {}".format(str(vger)), c(), parent=pidx)
 
         return str(t)
+
+    # To save more fields on the test dump, add the values to this dictionary.
+    TEST_CONFIG_FORMAT = {
+        "sfp": {
+            "config": None
+        },
+        "config": None,
+        "extra": None,
+        "sklk_pl_eth": None,
+        "jtagblob": None,
+        "global": {
+            "message_index": None,
+            "chain_index": None,
+        },
+    }
+    def dump_for_test(self, filename):
+        status = {}
+        # Get the json data for each device.  Cannot use iter because some bugs will cause the
+        # data to not be mapped correctly.
+        for dev in self._irises + self._cpes + self._vgers + self._hubs:
+            status[dev.serial] = {}
+            def save_config(config, values_to_save : dict):
+                if (values_to_save is None or not hasattr(config, 'items')):
+                    return config
+                retval = {}
+                for key, value in values_to_save.items():
+                    if key in config:
+                        retval[key] = save_config(config[key], values_to_save[key])
+                return retval
+            status[dev.serial] = save_config(dev._json, self.TEST_CONFIG_FORMAT)
+
+        with open(filename, "w+") as fptr:
+            json.dump({
+                "status": status,
+                "enumerate": self._soapy_enumerate
+            }, fptr, indent=4)
 
     def __iter__(self):
         for hub in self._hubs:

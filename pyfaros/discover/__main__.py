@@ -5,6 +5,7 @@ import inspect
 import sys
 import logging
 import pkg_resources
+import datetime
 from pyfaros.discover.discover import Discover
 
 __discover_description = """\
@@ -57,7 +58,13 @@ general_options.add_argument(
     help="Displays this help message and then exits.",
 )
 
+DEFAULT_DEBUG_TRACE = "/tmp/pyfaros-discover-{}.json"
 advanced_options = parser.add_argument_group("Advanced Options")
+advanced_options.add_argument(
+    "--debug-trace",
+    help="Creates a debug file that can be used re-create odd behavior.",
+    action="store_true",
+)
 advanced_options.add_argument(
     "-o", "--output",
     choices=["serial", "address"],
@@ -93,9 +100,15 @@ parsed = parser.parse_args()
 if parsed.debug:
     logging.basicConfig(level=logging.DEBUG)
 else:
-    logging.basicConfig(level=logging.ERROR)
+    logging.basicConfig(level=logging.INFO)
 
 top = Discover(soapy_enumerate_iterations=1, output=parsed.output)
+if parsed.debug_trace:
+    filename = DEFAULT_DEBUG_TRACE.format(str(datetime.datetime.now()).replace(" ", "_")) \
+        if parsed.debug_trace is True else parsed.debug_trace
+    logging.info("Logging debug trace to {}".format(filename))
+    top.dump_for_test(filename)
+
 if parsed.flat:
     iteration = sorted(
         top, key=Discover.Sortings.POWER_DEPENDENCY

@@ -10,7 +10,7 @@ main () {
     sha=`git rev-parse HEAD`
     subsha="${sha:0:8}"
 
-    echo "pyfaros_version=\"${version}-${subsha}\"" > "${project_dir}/version.py"
+    echo "pyfaros_version=\"${version}+${subsha}\"" > "${project_dir}/version.py"
 }
 
 main "$*" || exit $?
