@@ -357,20 +357,34 @@ class RRH:
     def __setitem__(self, key, value):
         raise NotImplementedError
 
-    def __init__(self, members, hub):
-        heads = list(filter(lambda x: x.rrh_index == 0 or x.rrh_head, members))
+    @classmethod
+    def get_head(cls, iris):
+        heads = cls.get_heads(iris)
         if len(heads) != 1:
-            log.debug("error in RRH constructor arguments")
-        self.nodes = []
-        self.head = heads[0] if heads else None
-        self.address = self.head.address if self.head else None
-        self.hub = hub
-        sfp_info = getattr(self.head, '_json', {}).get("sfp", {}) \
-            if self.head else {}
+            log.error("error in RRH constructor arguments. heads={}".
+                      format(", ".join(map(lambda x: x.serial, heads))))
+        return heads[0] if len(heads)==1 else None
+
+    @classmethod
+    def get_heads(cls, iris):
+        # NOTE: This use to identify rrh_index==0 as also a head node.  I don't know the use
+        #       case this was trying to fix and it causes issue when sklk-dev/-/issues/191 occurs.
+        return list(filter(lambda x: x.rrh_head, iris))
+
+    @classmethod
+    def get_config_from_head(cls, head) -> dict:
+        sfp_info = getattr(head, '_json', {}).get("sfp", {}) if head else {}
         if sfp_info == "None" or sfp_info is None:
             sfp_info = {}
-        self.config = sfp_info.get("config", {}).get("rrh", None) if self.head else None
-        if self.config is None:
+        return sfp_info.get("config", {}).get("rrh", None) if head else {}
+
+    def __init__(self, members, hub):
+        self.nodes = []
+        self.head = self.get_head(members)
+        self.address = self.head.address if self.head else None
+        self.hub = hub
+        self.config = self.get_config_from_head(self.head)
+        if not self.config:
             raise NotAnRRH()
         self.nodes = list(sorted(members, key=lambda x: x.rrh_index))
         self.serial = self.config["serial"]
@@ -416,6 +430,7 @@ class RRH:
 
 
 class HubRemote(Remote):
+    LAST_POSSIBLE_CHAIN = 7
 
     class Variant(_RemoteEnum):
         HUB = "hub"
@@ -477,21 +492,54 @@ class HubRemote(Remote):
             to this hub.
             """
         self._irises = list(
-            filter(lambda x: x.last_mac in self.macmatches and x.rrh_index >= 0,
-                   irises))
+            filter(lambda x: x.last_mac in self.macmatches, irises))
+        self._irises_by_serial = dict((iris.serial, iris) for iris in self._irises)
+        self._unpaired_nodes = {}
         for chain in sorted(list({x.chain_index for x in self._irises})):
             this_chain = list(
                 sorted(
                     filter(lambda x: x.chain_index == chain, self._irises),
                     key=lambda x: x.rrh_index,
                 ))
-            try:
-                self.chains[chain] = RRH(this_chain, self)
-            except NotAnRRH:
-                self.chains[chain] = OrderedDict()
-                for iris in this_chain:
-                    self.chains[chain][iris.rrh_index] = iris
-                    iris.chain = this_chain
+            this_chain = self.filter_chain_for_bad_indexes(this_chain)
+            self.create_chain(chain, this_chain)
+
+        # Use impossible chain numbers for nodes not discovered correctly
+        chain_idx = self.LAST_POSSIBLE_CHAIN
+        for nodes in self._unpaired_nodes.values():
+            self.create_chain(chain_idx, nodes)
+            chain_idx += 1
+
+    def create_chain(self, chain_idx, nodes):
+        try:
+            if (nodes):
+                self.chains[chain_idx] = RRH(nodes, self)
+        except NotAnRRH:
+            self.chains[chain_idx] = OrderedDict()
+            for iris in nodes:
+                self.chains[chain_idx][iris.rrh_index] = iris
+                iris.chain = nodes
+
+    def filter_chain_for_bad_indexes(self, this_chain : list) -> list:
+        # Handle https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191 more gracefully
+        # by assuming all of the rrh_index should be increased by 1 and flag the chain as unknown.
+        heads = RRH.get_heads(this_chain)
+        if len(heads) != 1:
+            log.error("error in RRH constructor arguments. heads={}".
+                      format(", ".join(map(lambda x: x.serial, heads))))
+
+        for head in heads:
+            if head.rrh_index == -1 and head.chain_index == 0:
+                # Use sfp config to remove nodes from list
+                log.error("Node {} is not matched to chain correctly. Trying to fix.".format(head.serial))
+                invalid_nodes = RRH.get_config_from_head(head).get("chain", [])
+                log.warning("These nodes will have the index increased by 1: {}.".
+                            format(", ".join(invalid_nodes)))
+                for iris in [self._irises_by_serial[serial] for serial in invalid_nodes]:
+                    iris.rrh_index+=1
+                    self._unpaired_nodes.setdefault(head, []).append(iris)
+                this_chain = [iris for iris in this_chain if iris.serial not in invalid_nodes]
+        return this_chain
 
     @asyncio.coroutine
     async def afetch(self):
@@ -698,7 +746,8 @@ class Discover:
                     thischainidx = c()
                     t.create_node(
                         "Chain {}  Serial {}  Count {}  FW {} FPGA {} {}".format(
-                            chidx+1, irises.serial, len(list(irises)),
+                            chidx+1 if chidx < hub.LAST_POSSIBLE_CHAIN else "UNKNOWN",
+                            irises.serial, len(list(irises)),
                             self.get_common(irises, 'firmware'),
                             self.get_common(irises, 'fpga'),
                             "(FIX SFP CONFIG)" if not irises.config_correct else ""),

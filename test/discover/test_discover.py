@@ -72,16 +72,36 @@ class TestDiscover(unittest.TestCase):
             devices = discover.Discover()
         output = self.convert_discover_to_dict(devices)
         self.assertDictEqual(test_config["expected_devices"], output)
-        return output
+        return devices
 
     @unittest.mock.patch("time.sleep", autospec=True)
     def test_discover(self, _):
         with open(os.path.join(filepath, "test_discover.json"), "r") as fptr:
             test_config = json.load(fptr)
-        self.run_with_config(test_config)
+        devices = self.run_with_config(test_config)
 
     @unittest.mock.patch("time.sleep", autospec=True)
     def test_partial_discover(self, _):
         with open(os.path.join(filepath, "test_partial_discover.json"), "r") as fptr:
             test_config = json.load(fptr)
+        self.run_with_config(test_config)
+
+    @unittest.mock.patch("time.sleep", autospec=True)
+    def test_discover_chain_5(self, _):
+        with open(os.path.join(filepath, "test_discover_chain_5.json"), "r") as fptr:
+            test_config = json.load(fptr)
+        self.run_with_config(test_config)
+
+    @unittest.mock.patch("time.sleep", autospec=True)
+    def test_discover_with_bad_rrh_index(self, _):
+        # Reproduce https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191
+        with open(os.path.join(filepath, "test_discover_chain_5.json"), "r") as fptr:
+            test_config = json.load(fptr)
+        # Modify the chain output to reproduce a sklk-dev bug where the chain and message indexes are wrong
+        for node in test_config["status"].values():
+            if "message_index" in node["global"].keys():
+                node["global"]["message_index"] -= 1
+                node["global"]["chain_index"] = 0
+        hub_0 = test_config["expected_devices"]["hubs"][0]
+        hub_0["chains"]["8"] = hub_0["chains"].pop("5")
         self.run_with_config(test_config)
