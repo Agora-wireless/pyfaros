@@ -72,10 +72,11 @@ class TestDiscover(unittest.TestCase):
                                         self.Device(test_config["enumerate"])) as SoapyDevice, \
              unittest.mock.patch.object(discover.Remote, "afetch", mock_afetch):
             devices = discover.Discover()
-        output = self.convert_discover_to_dict(devices)
-        self.assertDictEqual(test_config["expected_devices"], output)
         print()
         print(devices)
+        output = self.convert_discover_to_dict(devices)
+        print(json.dumps(output, indent=4))
+        self.assertDictEqual(test_config["expected_devices"], output)
         return devices
 
     @unittest.mock.patch("time.sleep", autospec=True)
