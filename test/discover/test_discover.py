@@ -3,20 +3,15 @@ import copy
 import unittest.mock
 import os
 import site
-import SoapySDR
-import urllib.request
 import json
-import http.client
-from argparse import Namespace
-from elasticsearch import Elasticsearch
-import logging
-import time
-from pprint import pprint
 
 filepath = os.path.dirname(os.path.abspath(__file__))
 site.addsitedir(os.path.join(filepath, '..', '..'))
 
-from pyfaros.discover import discover
+from test.utils import mock_imports
+
+with unittest.mock.patch('builtins.__import__', side_effect=mock_imports(["SoapySDR", ])):
+    from pyfaros.discover import discover
 
 class TestDiscover(unittest.TestCase):
     def setUp(self) -> None:
@@ -62,16 +57,24 @@ class TestDiscover(unittest.TestCase):
 
         return retval
 
+    class Device(object):
+        def __init__(self, devices):
+            self._devices = devices
+        def enumerate(self, _):
+            return self._devices
+
     def run_with_config(self, test_config):
         async def mock_afetch(dev):
             dev._json = test_config["status"].get(dev.serial, {})
             return dev
 
-        with unittest.mock.patch.object(SoapySDR.Device, "enumerate", autospec=True, return_value=test_config["enumerate"]), \
+        with unittest.mock.patch.object(discover.SoapySDR, "Device",
+                                        self.Device(test_config["enumerate"])) as SoapyDevice, \
              unittest.mock.patch.object(discover.Remote, "afetch", mock_afetch):
             devices = discover.Discover()
         output = self.convert_discover_to_dict(devices)
         self.assertDictEqual(test_config["expected_devices"], output)
+        print()
         print(devices)
         return devices
 
