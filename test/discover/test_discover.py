@@ -109,3 +109,26 @@ class TestDiscover(unittest.TestCase):
         hub_0 = test_config["expected_devices"]["hubs"][0]
         hub_0["chains"]["8"] = hub_0["chains"].pop("5")
         self.run_with_config(test_config)
+
+    @unittest.mock.patch("time.sleep", autospec=True)
+    def test_discover_with_no_hub(self, _):
+        # Reproduce https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191
+        with open(os.path.join(filepath, "test_discover_chain_5.json"), "r") as fptr:
+            test_config = json.load(fptr)
+        # Modify the chain output to reproduce a sklk-dev bug where the chain and message indexes are wrong
+        test_config["enumerate"] = [node for node in test_config["enumerate"] if node["serial"] != "FH4A000005"]
+        test_config["expected_devices"]["iris"] = \
+            list(test_config["expected_devices"]["hubs"][0]["chains"]["5"]["nodes"].values())
+        del test_config["expected_devices"]["hubs"][0]
+        self.run_with_config(test_config)
+
+    @unittest.mock.patch("time.sleep", autospec=True)
+    def test_discover_with_no_head(self, _):
+        # Reproduce https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191
+        with open(os.path.join(filepath, "test_discover_chain_5.json"), "r") as fptr:
+            test_config = json.load(fptr)
+        # Modify the chain output to reproduce a sklk-dev bug where the chain and message indexes are wrong
+        test_config["enumerate"] = [node for node in test_config["enumerate"] if node["serial"] != "RF3E000336"]
+        del test_config["expected_devices"]["hubs"][0]["chains"]["5"]["nodes"]["1"]
+        del test_config["expected_devices"]["hubs"][0]["chains"]["5"]["serial"]
+        self.run_with_config(test_config)
