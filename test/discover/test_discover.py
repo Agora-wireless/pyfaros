@@ -72,6 +72,7 @@ class TestDiscover(unittest.TestCase):
             devices = discover.Discover()
         output = self.convert_discover_to_dict(devices)
         self.assertDictEqual(test_config["expected_devices"], output)
+        print(devices)
         return devices
 
     @unittest.mock.patch("time.sleep", autospec=True)
