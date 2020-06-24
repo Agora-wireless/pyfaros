@@ -133,3 +133,9 @@ class TestDiscover(unittest.TestCase):
         del test_config["expected_devices"]["hubs"][0]["chains"]["5"]["nodes"]["1"]
         del test_config["expected_devices"]["hubs"][0]["chains"]["5"]["serial"]
         self.run_with_config(test_config)
+
+    @unittest.mock.patch("time.sleep", autospec=True)
+    def test_discover_double_chain(self, _):
+        with open(os.path.join(filepath, "pyfaros-discover-2020-06-24_15:00:14.430310.json"), "r") as fptr:
+            test_config = json.load(fptr)
+        self.run_with_config(test_config)
