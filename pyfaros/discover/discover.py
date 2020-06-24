@@ -431,6 +431,7 @@ class RRH:
 
 class HubRemote(Remote):
     LAST_POSSIBLE_CHAIN = 7
+    REFERENCE_NODE_CHAIN = [6, ]
 
     class Variant(_RemoteEnum):
         HUB = "hub"
@@ -501,12 +502,13 @@ class HubRemote(Remote):
                     filter(lambda x: x.chain_index == chain, self._irises),
                     key=lambda x: x.rrh_index,
                 ))
-            this_chain = self.filter_chain_for_bad_indexes(this_chain)
+            this_chain = self.filter_chain_for_bad_indexes(chain, this_chain)
             self.create_chain(chain, this_chain)
 
         # Use impossible chain numbers for nodes not discovered correctly
         chain_idx = self.LAST_POSSIBLE_CHAIN
-        for nodes in self._unpaired_nodes.values():
+        for head, nodes in self._unpaired_nodes.items():
+            log.debug("Creating chain for {}".format(head))
             self.create_chain(chain_idx, nodes)
             chain_idx += 1
 
@@ -520,25 +522,48 @@ class HubRemote(Remote):
                 self.chains[chain_idx][iris.rrh_index] = iris
                 iris.chain = nodes
 
-    def filter_chain_for_bad_indexes(self, this_chain : list) -> list:
+    def remove_nodes_from_chain(self, head):
+        nodes = RRH.get_config_from_head(head).get("chain", [])
+        for iris in self.iris_lookup(nodes):
+            self._unpaired_nodes.setdefault(head, []).append(iris)
+        return nodes
+
+    def iris_lookup(self, nodes):
+        return [self._irises_by_serial[serial] for serial in nodes if serial in self._irises_by_serial]
+
+    def filter_chain_for_bad_indexes(self, chain_index : int, this_chain : list) -> list:
         # Handle https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191 more gracefully
         # by assuming all of the rrh_index should be increased by 1 and flag the chain as unknown.
         heads = RRH.get_heads(this_chain)
         if len(heads) != 1:
-            log.error("error in RRH constructor arguments. heads={}".
-                      format(", ".join(map(lambda x: x.serial, heads))))
+            log.error("error in RRH constructor arguments for chain {}. heads={}".
+                      format(chain_index+1, ", ".join(map(lambda x: x.serial, heads))))
 
         for head in heads:
-            if head.rrh_index == -1 and head.chain_index == 0:
+            if head.rrh_index != 0:
+                offset = 0 - head.rrh_index
                 # Use sfp config to remove nodes from list
                 log.error("Node {} is not matched to chain correctly. Trying to fix.".format(head.serial))
-                invalid_nodes = RRH.get_config_from_head(head).get("chain", [])
-                log.warning("These nodes will have the index increased by 1: {}.".
-                            format(", ".join(invalid_nodes)))
-                for iris in [self._irises_by_serial[serial] for serial in invalid_nodes]:
-                    iris.rrh_index+=1
-                    self._unpaired_nodes.setdefault(head, []).append(iris)
+                invalid_nodes = self.remove_nodes_from_chain(head)
+                log.warning("These nodes will have the index increased by {}: {}.".
+                            format(offset, ", ".join(invalid_nodes)))
+                for iris in self.iris_lookup(invalid_nodes):
+                    iris.rrh_index+=offset
+
                 this_chain = [iris for iris in this_chain if iris.serial not in invalid_nodes]
+
+        heads = RRH.get_heads(this_chain)
+        if len(heads) != 1 and chain_index not in self.REFERENCE_NODE_CHAIN:
+            log.error("Couldn't fix chain issue. Treating all nodes as unknown chain")
+            for head in heads:
+                invalid_nodes = self.remove_nodes_from_chain(head)
+                this_chain = [iris for iris in this_chain if iris.serial not in invalid_nodes]
+
+            # Set the rest as headless
+            for iris in this_chain:
+                self._unpaired_nodes.setdefault("headless", []).append(iris)
+            this_chain = []
+
         return this_chain
 
     @asyncio.coroutine
@@ -767,7 +792,8 @@ class Discover:
                     thischainidx = c()
                     t.create_node(
                         "Chain {}  Count: {} FW {} FPGA {}  (Not RRH)".format(
-                            chidx+1, len(irises),
+                            chidx+1 if chidx < hub.LAST_POSSIBLE_CHAIN else "UNKNOWN",
+                            len(irises),
                             self.get_common(irises.values(), 'firmware'),
                             self.get_common(irises.values(), 'fpga')),
                         thischainidx,

@@ -130,8 +130,11 @@ class TestDiscover(unittest.TestCase):
             test_config = json.load(fptr)
         # Modify the chain output to reproduce a sklk-dev bug where the chain and message indexes are wrong
         test_config["enumerate"] = [node for node in test_config["enumerate"] if node["serial"] != "RF3E000336"]
-        del test_config["expected_devices"]["hubs"][0]["chains"]["5"]["nodes"]["1"]
-        del test_config["expected_devices"]["hubs"][0]["chains"]["5"]["serial"]
+        hub_0 = test_config["expected_devices"]["hubs"][0]
+        del hub_0["chains"]["5"]["nodes"]["1"]
+        del hub_0["chains"]["5"]["serial"]
+        # REVISIT: Behavior has been modified to list as unknown instead of trusting the chain number
+        hub_0["chains"]["8"] = hub_0["chains"].pop("5")
         self.run_with_config(test_config)
 
     @unittest.mock.patch("time.sleep", autospec=True)
