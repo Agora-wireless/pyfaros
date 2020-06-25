@@ -513,14 +513,19 @@ class HubRemote(Remote):
             chain_idx += 1
 
     def create_chain(self, chain_idx, nodes):
-        try:
-            if (nodes):
+        if (not nodes):
+            return
+        if (chain_idx not in self.REFERENCE_NODE_CHAIN):
+            try:
                 self.chains[chain_idx] = RRH(nodes, self)
-        except NotAnRRH:
-            self.chains[chain_idx] = OrderedDict()
-            for iris in nodes:
-                self.chains[chain_idx][iris.rrh_index] = iris
-                iris.chain = nodes
+                return
+            except NotAnRRH:
+                pass
+
+        self.chains[chain_idx] = OrderedDict()
+        for iris in nodes:
+            self.chains[chain_idx][iris.rrh_index] = iris
+            iris.chain = nodes
 
     def remove_nodes_from_chain(self, head):
         nodes = RRH.get_config_from_head(head).get("chain", [])
@@ -534,6 +539,10 @@ class HubRemote(Remote):
     def filter_chain_for_bad_indexes(self, chain_index : int, this_chain : list) -> list:
         # Handle https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191 more gracefully
         # by assuming all of the rrh_index should be increased by 1 and flag the chain as unknown.
+        if chain_index in self.REFERENCE_NODE_CHAIN:
+            # Don't filter on reference node
+            return this_chain
+
         heads = RRH.get_heads(this_chain)
         if len(heads) != 1:
             log.error("error in RRH constructor arguments for chain {}. heads={}".
@@ -553,7 +562,7 @@ class HubRemote(Remote):
                 this_chain = [iris for iris in this_chain if iris.serial not in invalid_nodes]
 
         heads = RRH.get_heads(this_chain)
-        if len(heads) != 1 and chain_index not in self.REFERENCE_NODE_CHAIN:
+        if len(heads) != 1:
             log.error("Couldn't fix chain issue. Treating all nodes as unknown chain")
             for head in heads:
                 invalid_nodes = self.remove_nodes_from_chain(head)
@@ -791,7 +800,7 @@ class Discover:
                 elif len(irises) > 0:
                     thischainidx = c()
                     t.create_node(
-                        "Chain {}  Count: {} FW {} FPGA {}  (Not RRH)".format(
+                        "Chain {}  Count: {} FW {} FPGA {}".format(
                             chidx+1 if chidx < hub.LAST_POSSIBLE_CHAIN else "UNKNOWN",
                             len(irises),
                             self.get_common(irises.values(), 'firmware'),
