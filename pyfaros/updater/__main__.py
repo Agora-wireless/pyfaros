@@ -14,10 +14,11 @@ import pkg_resources
 
 async def update_devices(environment: UpdateEnvironment, devices: Iterable[Remote], args) -> None:
     timeout = args.timeout
+    store_ssh = not args.no_ssh
     if timeout == 0:
-        await do_update(environment, devices)
+        await do_update(environment, devices, store_ssh=store_ssh)
     else:
-        if not await do_update_and_wait(environment, devices, 15, timeout):
+        if not await do_update_and_wait(environment, devices, 15, timeout, store_ssh=store_ssh):
             logging.error('Failed to reach devices within {} seconds after reboot'.format(timeout))
 
 
@@ -95,6 +96,11 @@ if __name__ == '__main__':
         '--patch-all',
         help="Patch everything on the network.",
         action="store_true",
+        default=False)
+    advanced_options.add_argument(
+        '--no-ssh',
+        help="Do not store ssh keys in /boot/ when updating cards.",
+        action='store_true',
         default=False)
 
     extra_helps = {

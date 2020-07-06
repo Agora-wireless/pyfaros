@@ -75,7 +75,7 @@ async def mount_boot(device):
         raise e
 
 
-async def replace_files(device, file_list, tmpdir):
+async def replace_files(device, file_list, tmpdir, store_ssh=False):
     for my_file in file_list:
         logging.debug(my_file)
         copy_command = "sudo -n cp /tmp/updater_{}/{} /boot/{}".format(
@@ -89,6 +89,22 @@ async def replace_files(device, file_list, tmpdir):
             logging.debug("Copy of {} -> {} failed on remote target {}".format(
                 my_file.local_name, my_file.remote_name, device.serial))
             raise e
+    if store_ssh:
+        try:
+            store_ssh_command = "[ -d /etc/iris/ssh/] || [ -d /boot/ssh ] || sudo -n cp -r /var/run/ssh /boot"
+            result = await device.ssh_connection.run(
+                store_ssh_command, check=False, term_type='xterm')
+
+            if result.exit_status == 0:
+                logging.info("SSH keys for device {} are present".format(device))
+            else:
+                logging.warn("Failed to store SSH keys for device {}".format(device))
+        except Exception as e:
+            logging.debug("FAILED: {} - {}".format(device, copy_command))
+            logging.debug(e)
+            logging.debug("Store SSH Keysfailed on remote target {}".format(
+                device.serial))            
+
     try:
         await device.ssh_connection.run(
             "sudo -n /bin/sync", check=True, term_type='xterm')
@@ -107,7 +123,7 @@ async def do_reboot(device):
     return True
 
 
-async def do_update(context, devices):
+async def do_update(context, devices, store_ssh=False):
     this_update_timestamp = str(time.time()).split('.')[0]
     async with Remote.sshify(devices):
         cmap_list = lambda d: [
@@ -143,7 +159,7 @@ async def do_update(context, devices):
 
         replace_exceptions = await asyncio.gather(
             *[
-                replace_files(d, cmap_list(d), this_update_timestamp)
+                replace_files(d, cmap_list(d), this_update_timestamp, store_ssh=store_ssh)
                 for d in devices
             ],
             return_exceptions=True)
@@ -189,12 +205,12 @@ async def wait_for_devices(devices: Iterable[Remote], interval: int, timeout: in
 
 
 async def do_update_and_wait(context: UpdateEnvironment, devices: Iterable[Remote],
-                             interval: int, timeout: int) -> bool:
+                             interval: int, timeout: int, store_ssh=False) -> bool:
     """
     Returns True if the devices are found within `timeout` seconds after the update, False otherwise.
     Devices are polled at an interval of `interval` seconds.
     """
-    await do_update(context, devices)
+    await do_update(context, devices, store_ssh=store_ssh)
 
     await asyncio.sleep(interval)
     log.info('Devices updated. Waiting for them to reappear on the network...')
