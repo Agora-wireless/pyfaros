@@ -94,6 +94,11 @@ advanced_options.add_argument(
     help="Don't display the tree graphics.",
     action='store_true',
 )
+advanced_options.add_argument(
+    '--prefer-ipv6',
+    action='store_true',
+    help='If devices have both IPv4 and IPv6 addresses, use IPv6 rather than IPv4.',
+)
 
 parsed = parser.parse_args()
 
@@ -102,7 +107,7 @@ if parsed.debug:
 else:
     logging.basicConfig(level=logging.INFO)
 
-top = Discover(soapy_enumerate_iterations=1, output=parsed.output)
+top = Discover(soapy_enumerate_iterations=1, output=parsed.output, ipv6=parsed.prefer_ipv6)
 if parsed.debug_trace:
     filename = DEFAULT_DEBUG_TRACE.format(str(datetime.datetime.now()).replace(" ", "_")) \
         if parsed.debug_trace is True else parsed.debug_trace
