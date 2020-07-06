@@ -31,6 +31,11 @@ except ImportError as e:
         raise e
 
 
+def is_ipv6(address: str):
+    # HACK: Need a better way to check if an ipv6 address containing
+    # zone index is an ipv6 address
+    return '::' in address
+
 class _RemoteEnum(Enum):
 
     @staticmethod
@@ -170,7 +175,7 @@ class CPERemote(Remote):
         self.uaa_id = None
         url = urllib.parse.urlparse(self.remote)
         self.address = url.hostname
-        if "fe80" in self.address:
+        if is_ipv6(self.address):
             self.address = "[" + self.address + "]"
         self._json_url = url._replace(scheme="http", netloc=self.address).geturl()
         self.variant = (
@@ -216,7 +221,7 @@ class VgerRemote(Remote):
         self.uaa_id = None
         url = urllib.parse.urlparse(self.remote)
         self.address = url.hostname
-        if "fe80" in self.address:
+        if is_ipv6(self.address):
             self.address = "[" + self.address + "]"
         self._json_url = url._replace(scheme="http", netloc=self.address).geturl()
         self.variant = VgerRemote.Variant.VGER
@@ -271,7 +276,7 @@ class IrisRemote(Remote):
         self.uaa_id = None
         url = urllib.parse.urlparse(self.remote)
         self.address = url.hostname
-        if "fe80" in self.address:
+        if is_ipv6(self.address):
             self.address = "[" + self.address + "]"
         self._json_url = url._replace(scheme="http", netloc=self.address).geturl()
         self.rrh_head = None
@@ -472,7 +477,7 @@ class HubRemote(Remote):
         # Annoying hack, aiohttp requires braces on URLs, asyncssh requires
         # they not be present, and urllib has no facilities for injecting and
         # removing them.
-        if "fe80" in self.address:
+        if is_ipv6(self.address):
             self.address = "[" + self.address + "]"
         self._json_url = url._replace(
             scheme="http", path="/status.json", netloc=self.address).geturl()
@@ -614,7 +619,7 @@ class Discover:
       on IO.
       """
 
-    def __init__(self, soapy_enumerate_iterations=3, output=None, timeout_ms=800):
+    def __init__(self, soapy_enumerate_iterations=3, output=None, timeout_ms=800, ipv6=False):
         self.time = datetime.datetime.now()
         # Grab an event loop so that we can get all of the json additional
         # information at once.
@@ -623,8 +628,13 @@ class Discover:
         # long timeout, and do it a lot, to try to get a good picture.
         soapy_enumerations = {}
         for _ in range(0, soapy_enumerate_iterations):
-            for found in map(dict,
-                             SoapySDR.Device.enumerate(str(dict(timeoutUs=timeout_ms * 1000)))):
+            args = SoapySDR.SoapySDRKwargs()
+            args['remote:timeout'] = str(timeout_ms * 1000)
+
+            if ipv6:
+                args['remote:ipver'] = '6'
+
+            for found in map(dict, SoapySDR.Device.enumerate(args)):
                 if "serial" in found and found["serial"] not in soapy_enumerations:
                     soapy_enumerations[found["serial"]] = found
             time.sleep(1)
