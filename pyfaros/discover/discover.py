@@ -9,6 +9,7 @@ from enum import Enum
 from functools import reduce, partial
 from types import MethodType
 import json
+import ipaddress
 
 import aiohttp
 import asyncssh
@@ -31,10 +32,12 @@ except ImportError as e:
         raise e
 
 
-def is_ipv6(address: str):
-    # HACK: Need a better way to check if an ipv6 address containing
-    # zone index is an ipv6 address
-    return '::' in address
+def is_ipv4(address: str) -> bool:
+    try:
+        return ipaddress.IPv4Address(address) is not None
+    except ipaddress.AddressValueError:
+        return False
+
 
 class _RemoteEnum(Enum):
 
@@ -175,7 +178,7 @@ class CPERemote(Remote):
         self.uaa_id = None
         url = urllib.parse.urlparse(self.remote)
         self.address = url.hostname
-        if is_ipv6(self.address):
+        if not is_ipv4(self.address):
             self.address = "[" + self.address + "]"
         self._json_url = url._replace(scheme="http", netloc=self.address).geturl()
         self.variant = (
@@ -221,7 +224,7 @@ class VgerRemote(Remote):
         self.uaa_id = None
         url = urllib.parse.urlparse(self.remote)
         self.address = url.hostname
-        if is_ipv6(self.address):
+        if not is_ipv4(self.address):
             self.address = "[" + self.address + "]"
         self._json_url = url._replace(scheme="http", netloc=self.address).geturl()
         self.variant = VgerRemote.Variant.VGER
@@ -276,7 +279,7 @@ class IrisRemote(Remote):
         self.uaa_id = None
         url = urllib.parse.urlparse(self.remote)
         self.address = url.hostname
-        if is_ipv6(self.address):
+        if not is_ipv4(self.address):
             self.address = "[" + self.address + "]"
         self._json_url = url._replace(scheme="http", netloc=self.address).geturl()
         self.rrh_head = None
@@ -477,7 +480,7 @@ class HubRemote(Remote):
         # Annoying hack, aiohttp requires braces on URLs, asyncssh requires
         # they not be present, and urllib has no facilities for injecting and
         # removing them.
-        if is_ipv6(self.address):
+        if not is_ipv4(self.address):
             self.address = "[" + self.address + "]"
         self._json_url = url._replace(
             scheme="http", path="/status.json", netloc=self.address).geturl()
