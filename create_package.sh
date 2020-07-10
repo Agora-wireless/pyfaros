@@ -5,8 +5,11 @@ main () {
     progdir=$(dirname "${progname}")
     project_dir=$(cd "${progdir}" && pwd)
 
-    bash "${project_dir}/create_version.sh"
+    pyfaros_version=`bash "${project_dir}/create_version.sh"`
     cd ${project_dir} && python3 "./setup.py" sdist bdist_wheel
+    pyfaros_package="${project_dir}/dist/pyfaros-${pyfaros_version}.tar.gz"
+    echo "Packaged ${pyfaros_package}"
+    cp "${pyfaros_package}" "${project_dir}/pyfaros.tar.gz"
 }
 
 main "$*" || exit $?
