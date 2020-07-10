@@ -166,6 +166,7 @@ class Remote:
 
 
 class CPERemote(Remote):
+    NAME = "CPE"
 
     class Variant(_RemoteEnum):
         STANDARD = "cpe"
@@ -212,6 +213,7 @@ class CPERemote(Remote):
                                                    self.firmware, self.fpga)
 
 class VgerRemote(Remote):
+    NAME = "VGER"
 
     class Variant(_RemoteEnum):
         VGER = "vger"
@@ -264,6 +266,7 @@ class IrisRemote(Remote):
         STANDARD = "iris030"
     Variant.UE.support_from = False
     Variant.UE.support_to = False
+    NAME = "Iris"
 
     def __init__(self, soapy_dict, loop=None):
         super().__init__(soapy_dict, loop=loop)
@@ -770,6 +773,30 @@ class Discover:
         else:
             return "mismatch"
 
+    def _display_stand_alone(self, t, parent, idx_gen, nodes):
+        if not nodes:
+            return
+        name = nodes[0].NAME
+        standalone = idx_gen()
+        t.create_node(
+            "{} Count: {}  FW {} FPGA {}".format(
+                name,
+                len(nodes),
+                self.get_common(nodes, 'firmware'),
+                self.get_common(nodes, 'fpga')),
+            standalone,
+            parent=parent)
+
+        if self.single_field:
+            node_list = self.delim.join(
+                str(getattr(iris, self.single_field))
+                for iris in nodes)
+            t.create_node(node_list, parent=standalone)
+        else:
+            for node in nodes:
+                t.create_node(
+                    "{} {}".format(name, str(node)), idx_gen(), parent=standalone)
+
     def __str__(self):
 
         def ctr():
@@ -837,38 +864,12 @@ class Discover:
                         for j in [irises[k] for k in sorted(irises.keys())]:
                             t.create_node("Iris {}".format(str(j)), c(), parent=thischainidx)
 
-        if self._standalone_irises:
-            standalone = c()
-            t.create_node(
-                "Standalone Count: {}  FW {} FPGA {}".format(
-                    len(self._standalone_irises),
-                    self.get_common(self._standalone_irises, 'firmware'),
-                    self.get_common(self._standalone_irises, 'fpga')),
-                standalone,
-                parent=first_node)
-
-            if self.single_field:
-                iris_list = self.delim.join(
-                    str(getattr(iris, self.single_field))
-                    for iris in self._standalone_irises)
-                t.create_node(iris_list, parent=standalone)
-            else:
-                for iris in self._standalone_irises:
-                    t.create_node(
-                        "Iris {}".format(iris.details()), c(), parent=standalone)
-
-        if len(self._cpes) > 0:
-            pidx = c()
-            t.create_node("Standalone CPEs", pidx, parent=first_node)
-            for cpe in self._cpes:
-                # Keep the extra space here, formats nicely against Iris being 1 char longer
-                t.create_node("CPE  {}".format(str(cpe)), c(), parent=pidx)
-
-        if len(self._vgers) > 0:
-            pidx = c()
-            t.create_node("Standalone VGERs", pidx, parent=first_node)
-            for vger in self._vgers:
-                t.create_node("VGER {}".format(str(vger)), c(), parent=pidx)
+        if (len(self._standalone_irises + self._cpes + self._vgers)):
+            clients = c()
+            t.create_node("Standalone Clients", clients, parent=first_node)
+            self._display_stand_alone(t, clients, c, self._standalone_irises)
+            self._display_stand_alone(t, clients, c, self._cpes)
+            self._display_stand_alone(t, clients, c, self._vgers)
 
         return str(t)
 
