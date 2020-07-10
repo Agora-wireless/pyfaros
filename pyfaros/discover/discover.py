@@ -495,6 +495,11 @@ class HubRemote(Remote):
         }.get(soapy_dict.get("som", None), HubRemote.Variant.HUB)
         self.chains = OrderedDict()
 
+    def _update_irises(self):
+        hub = SoapySDR.Device(self.soapy_dict)
+        hub.writeRegister("FAROS_TOP", 0xa0, (0xff << 24))
+        asyncio.get_event_loop().run_until_complete(asyncio.gather(*[iris.afetch() for iris in self._irises]))
+
     def _map_irises(self, irises):
         """
             Given all possible irises, figure out which ones are connected directly
@@ -502,6 +507,8 @@ class HubRemote(Remote):
             """
         self._irises = list(
             filter(lambda x: x.last_mac in self.macmatches, irises))
+        self._update_irises()
+
         self._irises_by_serial = dict((iris.serial, iris) for iris in self._irises)
         self._unpaired_nodes = {}
         for chain in sorted(list({x.chain_index for x in self._irises})):

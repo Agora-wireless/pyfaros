@@ -70,7 +70,8 @@ class TestDiscover(unittest.TestCase):
 
         with unittest.mock.patch.object(discover.SoapySDR, "Device",
                                         self.Device(test_config["enumerate"])) as SoapyDevice, \
-             unittest.mock.patch.object(discover.Remote, "afetch", mock_afetch):
+             unittest.mock.patch.object(discover.Remote, "afetch", mock_afetch), \
+             unittest.mock.patch.object(discover.HubRemote, "_update_irises", autospec=True, return_value=None):
             devices = discover.Discover()
         print()
         print(devices)
