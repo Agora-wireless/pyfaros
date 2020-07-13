@@ -40,7 +40,13 @@ class TestDiscover(unittest.TestCase):
                 if isinstance(irises, discover.RRH) and irises.serial:
                     rrh_data["serial"] = irises.serial
                     for iris in irises:
-                        rrh_data["nodes"][str(iris.rrh_index+1)] = iris.serial
+                        node_index = str(iris.rrh_index+1)
+                        if node_index in rrh_data["nodes"]:
+                            if type(rrh_data["nodes"][node_index]) != list:
+                                rrh_data["nodes"][node_index] = [rrh_data["nodes"][node_index], ]
+                            rrh_data["nodes"][node_index].append(iris.serial)
+                        else:
+                            rrh_data["nodes"][node_index] = iris.serial
                 else:
                     for rrh_index, iris in irises.items():
                         rrh_data["nodes"][str(rrh_index+1)] = iris.serial
@@ -150,5 +156,11 @@ class TestDiscover(unittest.TestCase):
     @unittest.mock.patch("time.sleep", autospec=True)
     def test_discover_double_chain(self, _):
         with open(os.path.join(filepath, "pyfaros-discover-2020-06-24_15:00:14.430310.json"), "r") as fptr:
+            test_config = json.load(fptr)
+        self.run_with_config(test_config)
+
+    @unittest.mock.patch("time.sleep", autospec=True)
+    def test_discover_2020_06_incompatible(self, _):
+        with open(os.path.join(filepath, "discover-2020-06-incompatible.json"), "r") as fptr:
             test_config = json.load(fptr)
         self.run_with_config(test_config)
