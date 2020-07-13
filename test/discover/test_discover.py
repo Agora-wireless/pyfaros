@@ -29,6 +29,8 @@ class TestDiscover(unittest.TestCase):
                 "serial": hub.serial,
                 "chains": {},
             }
+            if hub.error:
+                hub_data["error"] = True
             retval["hubs"].append(hub_data)
             for (chidx, irises) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
                 rrh_data = {
@@ -42,6 +44,8 @@ class TestDiscover(unittest.TestCase):
                 else:
                     for rrh_index, iris in irises.items():
                         rrh_data["nodes"][str(rrh_index+1)] = iris.serial
+                if irises.error:
+                    rrh_data["error"] = True
 
         if devices._standalone_irises:
             for node in devices._standalone_irises:
@@ -78,6 +82,7 @@ class TestDiscover(unittest.TestCase):
         output = self.convert_discover_to_dict(devices)
         print(json.dumps(output, indent=4))
         self.assertDictEqual(test_config["expected_devices"], output)
+
         return devices
 
     @unittest.mock.patch("time.sleep", autospec=True)
@@ -110,6 +115,8 @@ class TestDiscover(unittest.TestCase):
                 node["global"]["chain_index"] = 0
         hub_0 = test_config["expected_devices"]["hubs"][0]
         hub_0["chains"]["8"] = hub_0["chains"].pop("5")
+        hub_0["chains"]["8"]["error"] = True
+        hub_0["error"] = True
         self.run_with_config(test_config)
 
     @unittest.mock.patch("time.sleep", autospec=True)
@@ -136,6 +143,8 @@ class TestDiscover(unittest.TestCase):
         del hub_0["chains"]["5"]["serial"]
         # REVISIT: Behavior has been modified to list as unknown instead of trusting the chain number
         hub_0["chains"]["8"] = hub_0["chains"].pop("5")
+        hub_0["chains"]["8"]["error"] = True
+        hub_0["error"] = True
         self.run_with_config(test_config)
 
     @unittest.mock.patch("time.sleep", autospec=True)

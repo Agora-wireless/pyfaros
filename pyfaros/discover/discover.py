@@ -109,6 +109,7 @@ class Remote:
             yield list(connections)
 
     def __init__(self, soapy_dict, loop=None):
+        self.error = False
         self.soapy_dict = soapy_dict
         self.driver = soapy_dict["driver"] if "driver" in soapy_dict else None
         self.firmware = soapy_dict["firmware"] if "firmware" in soapy_dict else None
@@ -392,6 +393,7 @@ class RRH:
     def __init__(self, members, hub):
         self.nodes = []
         self.head = self.get_head(members)
+        self.error = not self.head
         self.address = self.head.address if self.head else None
         self.hub = hub
         self.config = self.get_config_from_head(self.head)
@@ -477,6 +479,7 @@ class HubRemote(Remote):
 
     def __init__(self, soapy_dict, loop=None):
         super().__init__(soapy_dict, loop=loop)
+        self.error = False
         self.cpld = soapy_dict["cpld"] if "cpld" in soapy_dict else None
         url = urllib.parse.urlparse(self.remote)
         self.address = url.hostname
@@ -520,30 +523,35 @@ class HubRemote(Remote):
                     filter(lambda x: x.chain_index == chain, self._irises),
                     key=lambda x: x.rrh_index,
                 ))
-            this_chain = self.filter_chain_for_bad_indexes(chain, this_chain)
-            self.create_chain(chain, this_chain)
+            this_chain, error = self.filter_chain_for_bad_indexes(chain, this_chain)
+            if error:
+                self.error = True
+            self.create_chain(chain, this_chain, error)
 
         # Use impossible chain numbers for nodes not discovered correctly
         chain_idx = self.LAST_POSSIBLE_CHAIN
         for head, nodes in self._unpaired_nodes.items():
             log.debug("Creating chain for {}".format(head))
-            self.create_chain(chain_idx, nodes)
+            self.error = True
+            self.create_chain(chain_idx, nodes, True)
             chain_idx += 1
 
-    def create_chain(self, chain_idx, nodes):
+    def create_chain(self, chain_idx, nodes, error):
         if (not nodes):
             return
         if (chain_idx not in self.REFERENCE_NODE_CHAIN):
             try:
                 self.chains[chain_idx] = RRH(nodes, self)
+                self.chains[chain_idx].error = error
                 return
             except NotAnRRH:
-                pass
+                error = True
 
         self.chains[chain_idx] = OrderedDict()
         for iris in nodes:
             self.chains[chain_idx][iris.rrh_index] = iris
             iris.chain = nodes
+        self.chains[chain_idx].error = error
 
     def remove_nodes_from_chain(self, head):
         nodes = RRH.get_config_from_head(head).get("chain", [])
@@ -554,23 +562,26 @@ class HubRemote(Remote):
     def iris_lookup(self, nodes):
         return [self._irises_by_serial[serial] for serial in nodes if serial in self._irises_by_serial]
 
-    def filter_chain_for_bad_indexes(self, chain_index : int, this_chain : list) -> list:
+    def filter_chain_for_bad_indexes(self, chain_index : int, this_chain : list) -> [list, bool]:
         # Handle https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191 more gracefully
         # by assuming all of the rrh_index should be increased by 1 and flag the chain as unknown.
         if chain_index in self.REFERENCE_NODE_CHAIN:
             # Don't filter on reference node
-            return this_chain
+            return this_chain, False
 
+        error = False
         heads = RRH.get_heads(this_chain)
         if len(heads) != 1:
             log.error("error in RRH constructor arguments for chain {}. heads={}".
                       format(chain_index+1, ", ".join(map(lambda x: x.serial, heads))))
+            error = True
 
         for head in heads:
             if head.rrh_index != 0:
                 offset = 0 - head.rrh_index
                 # Use sfp config to remove nodes from list
                 log.error("Node {} is not matched to chain correctly. Trying to fix.".format(head.serial))
+                error = True
                 invalid_nodes = self.remove_nodes_from_chain(head)
                 log.warning("These nodes will have the index increased by {}: {}.".
                             format(offset, ", ".join(invalid_nodes)))
@@ -582,6 +593,7 @@ class HubRemote(Remote):
         heads = RRH.get_heads(this_chain)
         if len(heads) != 1:
             log.error("Couldn't fix chain issue. Treating all nodes as unknown chain")
+            error = True
             for head in heads:
                 invalid_nodes = self.remove_nodes_from_chain(head)
                 this_chain = [iris for iris in this_chain if iris.serial not in invalid_nodes]
@@ -591,7 +603,7 @@ class HubRemote(Remote):
                 self._unpaired_nodes.setdefault("headless", []).append(iris)
             this_chain = []
 
-        return this_chain
+        return this_chain, error
 
     @asyncio.coroutine
     async def afetch(self):
