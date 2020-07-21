@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
+# Copyright (c) 2020 Skylark Wireless. All Rights Reserved.
 
 import argparse
 import asyncio

@@ -1,3 +1,4 @@
+# Copyright (c) 2020 Skylark Wireless. All Rights Reserved.
 import hashlib
 import logging
 import os

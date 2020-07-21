@@ -1,3 +1,4 @@
+# Copyright (c) 2020 Skylark Wireless. All Rights Reserved.
 import logging
 import pathlib
 import shutil

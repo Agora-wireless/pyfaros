@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Copyright (c) 2020 Skylark Wireless. All Rights Reserved.
 import copy
 import unittest.mock
 import os
