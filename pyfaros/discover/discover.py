@@ -78,8 +78,8 @@ class Remote:
             try:
                 self.ssh_connection = await asyncssh.connect(
                     self.address if "[" not in self.address else self.address[1:-1],
-                    username="sklk",
-                    password="sklk",
+                    username=self.username,
+                    password=self.password,
                     known_hosts=None,
                     client_keys=[],
                 )
@@ -125,12 +125,18 @@ class Remote:
         self.serial = soapy_dict["serial"] if "serial" in soapy_dict else None
         self.address = None  # default no known url
         self._json_url = None  # default no known url
+        self.username = None
+        self.password = None
         self._json = None  # default no json
         self._aioloop = loop if loop is not None else asyncio.get_event_loop()
         # ensure only one connection exists at a time.
         self._ssh_lock = asyncio.Lock(loop=self._aioloop)
         self.ssh_connection = None
         self.ssh_session = MethodType(Remote._ssh_session_no_connection, self)
+
+    def set_credentials(self, username, password):
+        self.username = username
+        self.password = password
 
     @asyncio.coroutine
     async def afetch(self):
@@ -932,6 +938,11 @@ class Discover:
             yield cpe
         for vger in self._vgers:
             yield vger
+
+    def set_credentials(self, username, password):
+        for device in self:
+            if hasattr(device, 'set_credentials'):
+                device.set_credentials(username, password)
 
     class Sortings:
 

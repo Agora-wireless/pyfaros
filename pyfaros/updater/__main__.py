@@ -37,6 +37,10 @@ if __name__ == '__main__':
     advanced_options = parser.add_argument_group("Advanced Options")
 
     general_options.add_argument(
+        '-U', '--user', help="Username", action="store", required=True)
+    general_options.add_argument(
+        '-P', '--password', help="Username", action="store", required=True)
+    general_options.add_argument(
         '-d', '--debug', help="turn on debug messages", action="store_true")
     general_options.add_argument(
         '-u', '--universal',
@@ -173,10 +177,10 @@ if __name__ == '__main__':
                                 logging.debug("Did remap for {} to {}".format(v1.value, v2.value))
                                 update_environment.mapping[v1] = update_environment.mapping[v2]
 
-
+            top = Discover()
             discovered = sorted(
                 filter(update_environment.availablefilter(),
-                       list(Discover())),
+                       list(top)),
                 key=Discover.Sortings.POWER_DEPENDENCY)
             logging.debug("Discovered objects: {}".format(discovered))
             if not args.patch_all:
@@ -190,6 +194,7 @@ if __name__ == '__main__':
             logging.debug("Filtered discovered objects: {}".format(discovered))
             logging.info("About to flash devices:")
             for device in discovered:
+                device.set_credentials(args.user, args.password)
                 logging.info("\t {} - {}\n\t\t{}\n\t\t{}\n\t\t{}".format(
                     device.serial, device.address,
                     update_environment.mapping[device.variant].bootbin,
