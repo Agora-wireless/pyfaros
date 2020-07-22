@@ -317,9 +317,6 @@ class IrisRemote(Remote):
             self.uaa_id = self.mac_to_uaa_id(self.last_mac)
             self.rrh_index = int(self._json["global"]["message_index"]) - 1
             self.chain_index = int(self._json["global"]["chain_index"])
-            if self.rrh_index >= 0:
-                # Force the variant if this is in an rrh
-                self.variant = IrisRemote.Variant.RRH
             self.rrh_head = (
                 reduce(
                     lambda x, y: x[y] if x is not None and y in x else None,
