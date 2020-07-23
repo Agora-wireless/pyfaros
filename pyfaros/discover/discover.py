@@ -527,10 +527,11 @@ class HubRemote(Remote):
                     filter(lambda x: x.chain_index == chain, self._irises),
                     key=lambda x: x.rrh_index,
                 ))
-            this_chain, error = self.filter_chain_for_bad_indexes(chain, this_chain)
+            rrhs, error = self.filter_chain_for_bad_indexes(chain, this_chain)
             if error:
                 self.error = True
-            self.create_chain(chain, this_chain, error)
+            for rrh in rrhs:
+                self.create_chain(chain, rrh, error)
 
         # Use impossible chain numbers for nodes not discovered correctly
         chain_idx = self.LAST_POSSIBLE_CHAIN
@@ -543,19 +544,30 @@ class HubRemote(Remote):
     def create_chain(self, chain_idx, nodes, error):
         if (not nodes):
             return
+
+        chain = None
         if (chain_idx not in self.REFERENCE_NODE_CHAIN):
             try:
-                self.chains[chain_idx] = RRH(nodes, self)
-                self.chains[chain_idx].error = error
-                return
+                chain = RRH(nodes, self)
+                chain.error = error
             except NotAnRRH:
                 error = True
+        if chain is None:
+            chain = OrderedDict()
+            for iris in nodes:
+                chain[iris.rrh_index] = iris
+                iris.chain = nodes
+            chain.error = error
 
-        self.chains[chain_idx] = OrderedDict()
-        for iris in nodes:
-            self.chains[chain_idx][iris.rrh_index] = iris
-            iris.chain = nodes
-        self.chains[chain_idx].error = error
+        if chain_idx not in self.chains:
+            self.chains[chain_idx] = chain
+        else:
+            # We need to use a list instead of just another entry
+            if type(self.chains[chain_idx]) != list:
+                self.chains[chain_idx] = [self.chains[chain_idx], ]
+            self.chains[chain_idx].append(chain)
+        if chain.error:
+            self.error = True
 
     def remove_nodes_from_chain(self, head):
         nodes = RRH.get_config_from_head(head).get("chain", [])
@@ -571,43 +583,26 @@ class HubRemote(Remote):
         # by assuming all of the rrh_index should be increased by 1 and flag the chain as unknown.
         if chain_index in self.REFERENCE_NODE_CHAIN:
             # Don't filter on reference node
-            return this_chain, False
+            return [this_chain, ], False
 
         error = False
         heads = RRH.get_heads(this_chain)
-        if len(heads) != 1:
-            log.error("error in RRH constructor arguments for chain {}. heads={}".
-                      format(chain_index+1, ", ".join(map(lambda x: x.serial, heads))))
-            error = True
-
+        rrhs = []
         for head in heads:
-            if head.rrh_index != 0:
-                offset = 0 - head.rrh_index
-                # Use sfp config to remove nodes from list
-                log.error("Node {} is not matched to chain correctly. Trying to fix.".format(head.serial))
-                error = True
-                invalid_nodes = self.remove_nodes_from_chain(head)
-                log.warning("These nodes will have the index increased by {}: {}.".
-                            format(offset, ", ".join(invalid_nodes)))
-                for iris in self.iris_lookup(invalid_nodes):
-                    iris.rrh_index+=offset
+            nodes = []
+            for serial in RRH.get_config_from_head(head).get("chain", []):
+                new_chain = []
+                for node in this_chain:
+                    if node.rrh_index < 0:
+                        error = True
+                    (nodes if node.serial == serial else new_chain ).append(node)
+                this_chain = new_chain
+            rrhs.append(nodes)
 
-                this_chain = [iris for iris in this_chain if iris.serial not in invalid_nodes]
+        if this_chain:
+            rrhs.append(this_chain)
 
-        heads = RRH.get_heads(this_chain)
-        if len(heads) != 1:
-            log.error("Couldn't fix chain issue. Treating all nodes as unknown chain")
-            error = True
-            for head in heads:
-                invalid_nodes = self.remove_nodes_from_chain(head)
-                this_chain = [iris for iris in this_chain if iris.serial not in invalid_nodes]
-
-            # Set the rest as headless
-            for iris in this_chain:
-                self._unpaired_nodes.setdefault("headless", []).append(iris)
-            this_chain = []
-
-        return this_chain, error
+        return rrhs, error
 
     @asyncio.coroutine
     async def afetch(self):
@@ -847,48 +842,50 @@ class Discover:
                 getattr(hub, "fpga", "")),
                 thishubidx,
                 parent=first_node)
-            for (chidx,
-                 irises) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
-                if isinstance(irises, RRH) and irises.serial:
-                    thischainidx = c()
-                    t.create_node(
-                        "Chain {}  Serial {}  Count {}  FW {} FPGA {} {}".format(
-                            chidx+1 if chidx < hub.LAST_POSSIBLE_CHAIN else "UNKNOWN",
-                            irises.serial, len(list(irises)),
-                            self.get_common(irises, 'firmware'),
-                            self.get_common(irises, 'fpga'),
-                            "(FIX SFP CONFIG)" if not irises.config_correct else ""),
-                        thischainidx,
-                        parent=thishubidx,
-                    )
-                    if self.single_field:
-                        iris_list = self.delim.join(
-                            str(getattr(iris, self.single_field)) for iris in irises)
-                        t.create_node(iris_list, parent=thischainidx)
-                    else:
-                        for iris in irises:
-                            t.create_node("Iris {}".format(iris), c(), parent=thischainidx)
-                elif irises is None:
-                    continue
-                elif len(irises) > 0:
-                    thischainidx = c()
-                    t.create_node(
-                        "Chain {}  Count: {} FW {} FPGA {}".format(
-                            chidx+1 if chidx < hub.LAST_POSSIBLE_CHAIN else "UNKNOWN",
-                            len(irises),
-                            self.get_common(irises.values(), 'firmware'),
-                            self.get_common(irises.values(), 'fpga')),
-                        thischainidx,
-                        parent=thishubidx,
-                    )
-                    if self.single_field:
-                        iris_list = self.delim.join(
-                            str(getattr(iris, self.single_field))
-                            for iris in irises.values())
-                        t.create_node(iris_list, parent=thischainidx)
-                    else:
-                        for j in [irises[k] for k in sorted(irises.keys())]:
-                            t.create_node("Iris {}".format(str(j)), c(), parent=thischainidx)
+            for (chidx, rrhs) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
+                if type(rrhs) is not list:
+                    rrhs = [rrhs, ]
+                for irises in rrhs:
+                    if isinstance(irises, RRH) and irises.serial:
+                        thischainidx = c()
+                        t.create_node(
+                            "Chain {}  Serial {}  Count {}  FW {} FPGA {} {}".format(
+                                chidx+1 if chidx < hub.LAST_POSSIBLE_CHAIN else "UNKNOWN",
+                                irises.serial, len(list(irises)),
+                                self.get_common(irises, 'firmware'),
+                                self.get_common(irises, 'fpga'),
+                                "(FIX SFP CONFIG)" if not irises.config_correct else ""),
+                            thischainidx,
+                            parent=thishubidx,
+                        )
+                        if self.single_field:
+                            iris_list = self.delim.join(
+                                str(getattr(iris, self.single_field)) for iris in irises)
+                            t.create_node(iris_list, parent=thischainidx)
+                        else:
+                            for iris in irises:
+                                t.create_node("Iris {}".format(iris), c(), parent=thischainidx)
+                    elif irises is None:
+                        continue
+                    elif len(irises) > 0:
+                        thischainidx = c()
+                        t.create_node(
+                            "Chain {}  Count: {} FW {} FPGA {}".format(
+                                chidx+1 if chidx < hub.LAST_POSSIBLE_CHAIN else "UNKNOWN",
+                                len(irises),
+                                self.get_common(irises.values(), 'firmware'),
+                                self.get_common(irises.values(), 'fpga')),
+                            thischainidx,
+                            parent=thishubidx,
+                        )
+                        if self.single_field:
+                            iris_list = self.delim.join(
+                                str(getattr(iris, self.single_field))
+                                for iris in irises.values())
+                            t.create_node(iris_list, parent=thischainidx)
+                        else:
+                            for j in [irises[k] for k in sorted(irises.keys())]:
+                                t.create_node("Iris {}".format(str(j)), c(), parent=thischainidx)
 
         if (len(self._standalone_irises + self._cpes + self._vgers)):
             clients = c()
@@ -904,15 +901,18 @@ class Discover:
         config = []
         for hub in self._hubs:
             hub_config = []
-            for (chidx, irises) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
-                if isinstance(irises, RRH) and irises.serial:
-                    rrh_config = []
-                    for iris in irises:
-                        rrh_config.append(iris.serial)
-                    hub_config.append({irises.serial: rrh_config})
-                elif len(irises) > 0:
-                    for j in [irises[k] for k in sorted(irises.keys())]:
-                        hub_config.append(j.serial)
+            for (chidx, rrhs) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
+                if type(rrhs) is not list:
+                    rrhs = [rrhs, ]
+                for irises in rrhs:
+                    if isinstance(irises, RRH) and irises.serial:
+                        rrh_config = []
+                        for iris in irises:
+                            rrh_config.append(iris.serial)
+                        hub_config.append({irises.serial: rrh_config})
+                    elif len(irises) > 0:
+                        for j in [irises[k] for k in sorted(irises.keys())]:
+                            hub_config.append(j.serial)
 
             config.append({hub.serial: hub_config})
         for node in self._standalone_irises + self._cpes + self._vgers:

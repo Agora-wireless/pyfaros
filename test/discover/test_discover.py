@@ -35,26 +35,35 @@ class TestDiscover(unittest.TestCase):
             if hub.error:
                 hub_data["error"] = True
             retval["hubs"].append(hub_data)
-            for (chidx, irises) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
-                rrh_data = {
-                    "nodes": {}
-                }
-                hub_data["chains"][str(chidx+1)] = rrh_data
-                if isinstance(irises, discover.RRH) and irises.serial:
-                    rrh_data["serial"] = irises.serial
-                    for iris in irises:
-                        node_index = str(iris.rrh_index+1)
-                        if node_index in rrh_data["nodes"]:
-                            if type(rrh_data["nodes"][node_index]) != list:
-                                rrh_data["nodes"][node_index] = [rrh_data["nodes"][node_index], ]
-                            rrh_data["nodes"][node_index].append(iris.serial)
-                        else:
-                            rrh_data["nodes"][node_index] = iris.serial
-                else:
-                    for rrh_index, iris in irises.items():
-                        rrh_data["nodes"][str(rrh_index+1)] = iris.serial
-                if irises.error:
-                    rrh_data["error"] = True
+            for (chidx, rrhs) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
+                if type(rrhs) is not list:
+                    rrhs = [rrhs, ]
+                for irises in rrhs:
+                    chidx_s = str(chidx+1)
+                    rrh_data = {
+                        "nodes": {}
+                    }
+                    if chidx_s in hub_data["chains"]:
+                        if type(hub_data["chains"]) is not list:
+                            hub_data["chains"][chidx_s] = [hub_data["chains"][chidx_s], ]
+                        hub_data["chains"][chidx_s].append(rrh_data)
+                    else:
+                        hub_data["chains"][chidx_s] = rrh_data
+                    if isinstance(irises, discover.RRH) and irises.serial:
+                        rrh_data["serial"] = irises.serial
+                        for iris in irises:
+                            node_index = str(iris.rrh_index+1)
+                            if node_index in rrh_data["nodes"]:
+                                if type(rrh_data["nodes"][node_index]) != list:
+                                    rrh_data["nodes"][node_index] = [rrh_data["nodes"][node_index], ]
+                                rrh_data["nodes"][node_index].append(iris.serial)
+                            else:
+                                rrh_data["nodes"][node_index] = iris.serial
+                    else:
+                        for rrh_index, iris in irises.items():
+                            rrh_data["nodes"][str(rrh_index+1)] = iris.serial
+                    if irises.error:
+                        rrh_data["error"] = True
 
         if devices._standalone_irises:
             for node in devices._standalone_irises:
@@ -126,8 +135,12 @@ class TestDiscover(unittest.TestCase):
                 node["global"]["message_index"] -= 1
                 node["global"]["chain_index"] = 0
         hub_0 = test_config["expected_devices"]["hubs"][0]
-        hub_0["chains"]["8"] = hub_0["chains"].pop("5")
-        hub_0["chains"]["8"]["error"] = True
+        nodes = {}
+        for key, iris in hub_0["chains"]["5"]["nodes"].items():
+            nodes[str(int(key)-1)] = iris
+        hub_0["chains"]["5"]["nodes"] = nodes
+        hub_0["chains"]["1"] = hub_0["chains"].pop("5")
+        hub_0["chains"]["1"]["error"] = True
         hub_0["error"] = True
         self.run_with_config(test_config)
 
@@ -151,9 +164,7 @@ class TestDiscover(unittest.TestCase):
         hub_0 = test_config["expected_devices"]["hubs"][0]
         del hub_0["chains"]["5"]["nodes"]["1"]
         del hub_0["chains"]["5"]["serial"]
-        # REVISIT: Behavior has been modified to list as unknown instead of trusting the chain number
-        hub_0["chains"]["8"] = hub_0["chains"].pop("5")
-        hub_0["chains"]["8"]["error"] = True
+        hub_0["chains"]["5"]["error"] = True
         hub_0["error"] = True
         self.run_with_config(test_config)
 
@@ -164,5 +175,10 @@ class TestDiscover(unittest.TestCase):
 
     def test_discover_2020_06_incompatible(self, _):
         with open(os.path.join(filepath, "discover-2020-06-incompatible.json"), "r") as fptr:
+            test_config = json.load(fptr)
+        self.run_with_config(test_config)
+
+    def test_discover_daisy_chain(self, _):
+        with open(os.path.join(filepath, "discover_daisy_chain.json"), "r") as fptr:
             test_config = json.load(fptr)
         self.run_with_config(test_config)
