@@ -213,6 +213,10 @@ async def do_update_and_wait(context: UpdateEnvironment, devices: Iterable[Remot
     """
     await do_update(context, devices, store_ssh=store_ssh)
 
+    if not any(devices):
+        log.info('No devices updated.')
+        return True
+
     await asyncio.sleep(interval)
     log.info('Devices updated. Waiting for them to reappear on the network...')
 
