@@ -622,14 +622,17 @@ class HubRemote(Remote):
     def __iter__(self):
         try:
             yield self
-            for chain in self.chains.values():
-                if isinstance(chain, RRH):
-                    yield chain
-                    for v in chain:
-                        yield v
-                else:
-                    for c in chain.values():
-                        yield c
+            for rrhs in self.chains.values():
+                if type(rrhs) is not list:
+                    rrhs = [rrhs, ]
+                for chain in rrhs:
+                    if isinstance(chain, RRH):
+                        yield chain
+                        for v in chain:
+                            yield v
+                    else:
+                        for c in chain.values():
+                            yield c
         except StopIteration:
             return
 
