@@ -5,6 +5,7 @@ import unittest.mock
 import os
 import site
 import json
+import yaml
 
 filepath = os.path.dirname(os.path.abspath(__file__))
 site.addsitedir(os.path.join(filepath, '..', '..'))
@@ -14,6 +15,7 @@ from test.utils import mock_imports
 with unittest.mock.patch('builtins.__import__', side_effect=mock_imports(["SoapySDR", ])):
     from pyfaros.discover import discover
 
+@unittest.mock.patch("time.sleep", autospec=True)
 class TestDiscover(unittest.TestCase):
     def setUp(self) -> None:
         self.maxDiff = None
@@ -89,28 +91,31 @@ class TestDiscover(unittest.TestCase):
         output = self.convert_discover_to_dict(devices)
         print(json.dumps(output, indent=4))
         self.assertDictEqual(test_config["expected_devices"], output)
+        if "as_yaml" in test_config:
+            as_yaml = devices._as_yaml()
+            print("yaml:\n{}".format(as_yaml))
+            expected = '\n'.join(test_config["as_yaml"])
+            self.assertEqual(
+                yaml.load(expected, Loader=yaml.FullLoader),
+                yaml.load(as_yaml, Loader=yaml.FullLoader))
 
         return devices
 
-    @unittest.mock.patch("time.sleep", autospec=True)
     def test_discover(self, _):
         with open(os.path.join(filepath, "test_discover.json"), "r") as fptr:
             test_config = json.load(fptr)
         devices = self.run_with_config(test_config)
 
-    @unittest.mock.patch("time.sleep", autospec=True)
     def test_partial_discover(self, _):
         with open(os.path.join(filepath, "test_partial_discover.json"), "r") as fptr:
             test_config = json.load(fptr)
         self.run_with_config(test_config)
 
-    @unittest.mock.patch("time.sleep", autospec=True)
     def test_discover_chain_5(self, _):
         with open(os.path.join(filepath, "test_discover_chain_5.json"), "r") as fptr:
             test_config = json.load(fptr)
         self.run_with_config(test_config)
 
-    @unittest.mock.patch("time.sleep", autospec=True)
     def test_discover_with_bad_rrh_index(self, _):
         # Reproduce https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191
         with open(os.path.join(filepath, "test_discover_chain_5.json"), "r") as fptr:
@@ -126,7 +131,6 @@ class TestDiscover(unittest.TestCase):
         hub_0["error"] = True
         self.run_with_config(test_config)
 
-    @unittest.mock.patch("time.sleep", autospec=True)
     def test_discover_with_no_hub(self, _):
         # Reproduce https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191
         with open(os.path.join(filepath, "test_discover_chain_5.json"), "r") as fptr:
@@ -138,7 +142,6 @@ class TestDiscover(unittest.TestCase):
         del test_config["expected_devices"]["hubs"][0]
         self.run_with_config(test_config)
 
-    @unittest.mock.patch("time.sleep", autospec=True)
     def test_discover_with_no_head(self, _):
         # Reproduce https://gitlab.com/skylark-wireless/software/sklk-dev/-/issues/191
         with open(os.path.join(filepath, "test_discover_chain_5.json"), "r") as fptr:
@@ -154,13 +157,11 @@ class TestDiscover(unittest.TestCase):
         hub_0["error"] = True
         self.run_with_config(test_config)
 
-    @unittest.mock.patch("time.sleep", autospec=True)
     def test_discover_double_chain(self, _):
         with open(os.path.join(filepath, "pyfaros-discover-2020-06-24_15:00:14.430310.json"), "r") as fptr:
             test_config = json.load(fptr)
         self.run_with_config(test_config)
 
-    @unittest.mock.patch("time.sleep", autospec=True)
     def test_discover_2020_06_incompatible(self, _):
         with open(os.path.join(filepath, "discover-2020-06-incompatible.json"), "r") as fptr:
             test_config = json.load(fptr)

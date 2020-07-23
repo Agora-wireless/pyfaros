@@ -653,6 +653,7 @@ class Discover:
         # Grab an event loop so that we can get all of the json additional
         # information at once.
         self._loop = asyncio.new_event_loop()
+        self._yaml = False
         # Avahi broadcasts occasionally don't respond in time. Do it with a
         # long timeout, and do it a lot, to try to get a good picture.
         soapy_enumerations = {}
@@ -778,6 +779,10 @@ class Discover:
             self.single_field = ""
         self.delim = " "
 
+    def set_options(self, yaml=None):
+        if yaml is not None:
+            self._yaml = yaml
+
     def get_common(self, irises, field):
         values = set([getattr(iris, field, None) for iris in irises])
         if len(values) == 0:
@@ -814,7 +819,12 @@ class Discover:
                     "{} {}".format(name, str(node)), idx_gen(), parent=standalone)
 
     def __str__(self):
+        if self._yaml:
+            return self._as_yaml()
+        else:
+            return self._as_tree()
 
+    def _as_tree(self):
         def ctr():
             val = [0]
 
@@ -888,6 +898,26 @@ class Discover:
             self._display_stand_alone(t, clients, c, self._vgers)
 
         return str(t)
+
+    def _as_yaml(self):
+        import yaml
+        config = []
+        for hub in self._hubs:
+            hub_config = []
+            for (chidx, irises) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
+                if isinstance(irises, RRH) and irises.serial:
+                    rrh_config = []
+                    for iris in irises:
+                        rrh_config.append(iris.serial)
+                    hub_config.append({irises.serial: rrh_config})
+                elif len(irises) > 0:
+                    for j in [irises[k] for k in sorted(irises.keys())]:
+                        hub_config.append(j.serial)
+
+            config.append({hub.serial: hub_config})
+        for node in self._standalone_irises + self._cpes + self._vgers:
+            config.append(node.serial)
+        return yaml.dump(config)
 
     # To save more fields on the test dump, add the values to this dictionary.
     TEST_CONFIG_FORMAT = {
