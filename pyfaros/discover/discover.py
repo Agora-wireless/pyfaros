@@ -16,8 +16,10 @@ import aiohttp
 import asyncssh
 
 import SoapySDR
+from pyfaros.ssh import EasySsh
 
 log = logging.getLogger(__name__)
+logging.getLogger("paramiko.transport").setLevel(level=logging.WARNING)
 
 try:
     from contextlib import AsyncExitStack, asynccontextmanager
@@ -133,6 +135,9 @@ class Remote:
         self._ssh_lock = asyncio.Lock(loop=self._aioloop)
         self.ssh_connection = None
         self.ssh_session = MethodType(Remote._ssh_session_no_connection, self)
+
+    def set_variant(self):
+        pass
 
     def set_credentials(self, username, password):
         self.username = username
@@ -504,6 +509,24 @@ class HubRemote(Remote):
             "zu9eg": HubRemote.Variant.SOM9,
         }.get(soapy_dict.get("som", None), HubRemote.Variant.HUB)
         self.chains = OrderedDict()
+
+    def _detect_som_version(self):
+        connection = EasySsh(self.serial, self.address, self.username, self.password)
+        codes = {
+            "0x24739093": self.Variant.SOM6,
+            "0x24738093": self.Variant.SOM9,
+        }
+        results = []
+        results.append(connection.runCommand(
+            'su -c "echo 0xffca0040 > /sys/firmware/zynqmp/config_reg"', sudo=True))
+        code = connection.runCommand("cat /sys/firmware/zynqmp/config_reg", sudo=True)
+        connection.runCommand("echo /tmp/version", sudo=True)
+        return codes.get(code, HubRemote.Variant.HUB)
+
+    def set_variant(self):
+        if self.variant == HubRemote.Variant.HUB or True:
+            self.variant = self._detect_som_version()
+            log.debug("{}: setting hub variant to {}".format(self.serial, self.variant))
 
     def _update_irises(self):
         hub = SoapySDR.Device(self.soapy_dict)

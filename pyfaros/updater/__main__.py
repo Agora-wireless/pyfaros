@@ -195,6 +195,7 @@ if __name__ == '__main__':
             logging.info("About to flash devices:")
             for device in discovered:
                 device.set_credentials(args.user, args.password)
+                device.set_variant()
                 logging.info("\t {} - {}\n\t\t{}\n\t\t{}\n\t\t{}".format(
                     device.serial, device.address,
                     update_environment.mapping[device.variant].bootbin,
