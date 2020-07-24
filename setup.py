@@ -18,7 +18,9 @@ setuptools.setup(
     description="discover/update skylark wireless devices",
     url="https://gitlab.com/skylark-wireless/software/sklk-utils/",
     packages=[os.path.join("pyfaros", pkg) for pkg in setuptools.find_packages("pyfaros" )],
-    data_files=[('.',['requirements.txt']), ('.',['version.py'])],
+    package_data={"pyfaros": ["enable_sudo.sh", ]},
+    include_package_data=True,
+    data_files=[('.',['version.py', 'requirements.txt']),],
     install_requires=install_requires,
     python_requires='>=3.6',
 )

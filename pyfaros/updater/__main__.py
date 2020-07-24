@@ -107,6 +107,11 @@ if __name__ == '__main__':
         help="Do not store ssh keys in /boot/ when updating cards.",
         action='store_true',
         default=False)
+    advanced_options.add_argument(
+        '--enable-sudo',
+        help="Force a password-less sudo.  Only used on firmware older than 2019-07.0.0",
+        action='store_true',
+        default=False)
 
     extra_helps = {
         "hub:som6": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
@@ -195,6 +200,8 @@ if __name__ == '__main__':
             logging.info("About to flash devices:")
             for device in discovered:
                 device.set_credentials(args.user, args.password)
+                if args.enable_sudo:
+                    device.enable_sudo()
                 device.set_variant()
                 logging.info("\t {} - {}\n\t\t{}\n\t\t{}\n\t\t{}".format(
                     device.serial, device.address,

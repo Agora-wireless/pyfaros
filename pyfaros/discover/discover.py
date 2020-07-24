@@ -11,6 +11,7 @@ from functools import reduce, partial
 from types import MethodType
 import json
 import ipaddress
+import os
 
 import aiohttp
 import asyncssh
@@ -20,6 +21,9 @@ from pyfaros.ssh import EasySsh
 
 log = logging.getLogger(__name__)
 logging.getLogger("paramiko.transport").setLevel(level=logging.WARNING)
+
+_filepath = os.path.dirname(os.path.abspath(__file__))
+_pyfaros_path = os.path.abspath(os.path.join(_filepath, '..'))
 
 try:
     from contextlib import AsyncExitStack, asynccontextmanager
@@ -58,6 +62,10 @@ class Remote:
         for byte_idx in range(3):
             uaa_id += ((mac >> (byte_idx*8))&0xff) << ((2-byte_idx)*8)
         return uaa_id
+
+    @property
+    def ip_address(self):
+        return self.address if "[" not in self.address else self.address[1:-1]
 
     @asynccontextmanager
     async def _ssh_session_no_connection(self):
@@ -158,6 +166,25 @@ class Remote:
         else:
             log.debug("url was none")
         return self
+
+    async def _update_sudo_async(self):
+        print("{}: updating sudo".format(self.serial))
+        return self
+
+    def enable_sudo(self):
+        # While this could be made asynchronous, it is support upgrading old firmware
+        log.debug("{}: Enabling sudo using {}".format(self.serial, self.address))
+        connection = EasySsh(self.serial, self.ip_address, self.username, self.password)
+        results = []
+        filename = os.path.join(_pyfaros_path, 'enable_sudo.sh')
+        tmp_filename = "/tmp/{0}".format(os.path.basename(filename))
+        results.extend((connection.copyFile(filename, tmp_filename) or
+                       "Copied {0} to {1}".format(filename, tmp_filename)).split("\n"))
+        results.extend(connection.runCommand("chmod a+x {}".format(tmp_filename), sudo=True).split("\n" ))
+        results.extend(connection.runCommand(tmp_filename, sudo=True).split("\n"))
+        for line in results:
+            if line:
+                log.debug("{}: {}".format(self.serial, line))
 
     def __str__(self):
         return self.serial
