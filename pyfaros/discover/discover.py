@@ -551,7 +551,7 @@ class HubRemote(Remote):
         return codes.get(code, HubRemote.Variant.HUB)
 
     def set_variant(self):
-        if self.variant == HubRemote.Variant.HUB or True:
+        if self.variant == HubRemote.Variant.HUB:
             self.variant = self._detect_som_version()
             log.debug("{}: setting hub variant to {}".format(self.serial, self.variant))
 
