@@ -169,7 +169,7 @@ class TestDiscover(unittest.TestCase):
         self.run_with_config(test_config)
 
     def test_discover_double_chain(self, _):
-        with open(os.path.join(filepath, "pyfaros-discover-2020-06-24_15:00:14.430310.json"), "r") as fptr:
+        with open(os.path.join(filepath, "discover-double-chain.json"), "r") as fptr:
             test_config = json.load(fptr)
         self.run_with_config(test_config)
 
