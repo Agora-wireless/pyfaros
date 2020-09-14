@@ -39,7 +39,7 @@ if __name__ == '__main__':
     general_options.add_argument(
         '-U', '--user', help="Username", action="store", required=True)
     general_options.add_argument(
-        '-P', '--password', help="Username", action="store", required=True)
+        '-P', '--password', help="Password", action="store", required=True)
     general_options.add_argument(
         '-d', '--debug', help="turn on debug messages", action="store_true")
     general_options.add_argument(

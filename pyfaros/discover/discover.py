@@ -204,6 +204,13 @@ class Remote:
 
         raise KeyError('Fields {} do not exist in the JSON'.format(fields))
 
+    async def async_do_reboot(self, recursive=False):
+        from pyfaros.updater.updater import do_reboot
+        async with Remote.sshify([self, ]):
+            await do_reboot(self)
+
+    def walk(self, depth=None):
+        yield self
 
 class CPERemote(Remote):
     NAME = "CPE"
@@ -477,6 +484,38 @@ class RRH:
     def __str__(self):
         return self.serial
 
+    def set_credentials(self, username, password):
+        pass
+
+    def walk(self, depth=None):
+        if depth != 0:
+            depth = depth-1 if depth is not None else None
+            for node in self.nodes:
+                yield node
+        yield self
+
+    async def async_do_reboot(self, recursive=False):
+        # Ignore recursive and use the hub to do a chain reboot
+        cmd = "sudo -n chain_power reboot {}".format(self.chain+1)
+        if self.hub.ssh_connection:
+            await self.hub.ssh_connection.run(cmd, check=True, term_type='xterm')
+        else:
+            async with Remote.sshify([self.hub, ]):
+                await self.hub.ssh_connection.run(cmd, check=True, term_type='xterm')
+
+        return True
+
+class Chain(OrderedDict):
+    def walk(self, depth=None):
+        for device in self.values():
+            yield device
+
+    def async_do_reboot(self, recursive):
+        for device in self.values():
+            device.async_do_reboot()
+
+    def set_credentials(self, username, password):
+        pass
 
 class HubRemote(Remote):
     LAST_POSSIBLE_CHAIN = 7
@@ -603,7 +642,7 @@ class HubRemote(Remote):
             except NotAnRRH:
                 error = True
         if chain is None:
-            chain = OrderedDict()
+            chain = Chain()
             for iris in nodes:
                 chain[iris.rrh_index] = iris
                 iris.chain = nodes
@@ -686,6 +725,24 @@ class HubRemote(Remote):
         except StopIteration:
             return
 
+    def walk(self, depth=None):
+        if depth != 0:
+            depth = depth-1 if depth is not None else None
+            for rrhs in self.chains.values():
+                if type(rrhs) is not list:
+                    rrhs = [rrhs, ]
+                for chain in rrhs:
+                    yield from chain.walk(depth)
+        yield self
+
+    async def async_do_reboot(self, recursive=False):
+        from pyfaros.updater.updater import do_reboot
+        for device in self.walk(depth=1 if recursive else 0):
+            if device != self:
+                await device.async_do_reboot(recursive)
+        print("Rebooting {}".format(self.serial))
+        async with Remote.sshify([self, ]):
+            await do_reboot(self)
 
 class Discover:
     """
