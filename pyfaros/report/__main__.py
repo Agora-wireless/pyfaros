@@ -11,7 +11,7 @@ from pyfaros.discover.discover import Discover
 from pyfaros.report.report import do_report
 
 __discover_description = """\
-Reboot device on the Skylark Wireless network 
+Create a report for devices on the Skylark Wireless network
 
 """
 
@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(
     add_help=False,
 )
 parser.add_argument(
-    'serial', help="Serials to get a detailed report", nargs="*")
+    'serial', help="Serials to get a detailed report (leave blank for all devices)", nargs="*")
 
 general_options = parser.add_argument_group("General Options")
 general_options.add_argument(
