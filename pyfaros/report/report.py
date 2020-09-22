@@ -66,6 +66,8 @@ async def do_hub_report(device : discover.Remote, filename : str, indent=None):
         "HUB power status": "sudo hub_cpld -P",
         "HUB power monitor": "sudo hub_cpld -l",
         "HUB fpga info": "sudo hub_fpga -i",
+        "HUB deadlock register": "hub_fpga -v2 -r 0xf8",
+        "HUB beamformer": "hub_fpga -v2 -r 0xfc",
         "HUB clock": "sudo journalctl -n 100 -u hub_clock --no-pager",
         "HUB web monitor": "sudo journalctl -n 100 -u hub_web_monitor --no-pager",
     }
