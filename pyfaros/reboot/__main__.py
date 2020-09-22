@@ -38,6 +38,8 @@ general_options.add_argument(
 general_options.add_argument(
     '-R', '--recursive', help="Reboot all connected devices", action="store_true", required=False)
 general_options.add_argument(
+    '-f', '--force', help="Reboot all chains whether detected or not", action="store_true", required=False)
+general_options.add_argument(
     "-v", "--version",
     action="version",
     #version="pyfaros-{}".format(dir(pyfaros)),
@@ -71,6 +73,6 @@ for device in top:
     device.set_credentials(parsed.user, parsed.password)
 
 devices = [device for device in top if device.serial in parsed.serial]
-do_reboot(devices, recursive=parsed.recursive)
+do_reboot(devices, recursive=parsed.recursive, force=parsed.force)
 
 sys.exit(0)

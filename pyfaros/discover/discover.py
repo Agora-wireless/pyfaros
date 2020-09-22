@@ -204,7 +204,7 @@ class Remote:
 
         raise KeyError('Fields {} do not exist in the JSON'.format(fields))
 
-    async def async_do_reboot(self, recursive=False):
+    async def async_do_reboot(self, recursive=False, force=False):
         from pyfaros.updater.updater import do_reboot
         async with Remote.sshify([self, ]):
             await do_reboot(self)
@@ -494,7 +494,7 @@ class RRH:
                 yield node
         yield self
 
-    async def async_do_reboot(self, recursive=False):
+    async def async_do_reboot(self, recursive=False, force=False):
         # Ignore recursive and use the hub to do a chain reboot
         cmd = "sudo -n chain_power reboot {}".format(self.chain+1)
         if self.hub.ssh_connection:
@@ -510,7 +510,7 @@ class Chain(OrderedDict):
         for device in self.values():
             yield device
 
-    def async_do_reboot(self, recursive):
+    def async_do_reboot(self, recursive, force=False):
         for device in self.values():
             device.async_do_reboot()
 
@@ -735,13 +735,23 @@ class HubRemote(Remote):
                     yield from chain.walk(depth)
         yield self
 
-    async def async_do_reboot(self, recursive=False):
-        from pyfaros.updater.updater import do_reboot
-        for device in self.walk(depth=1 if recursive else 0):
-            if device != self:
-                await device.async_do_reboot(recursive)
-        print("Rebooting {}".format(self.serial))
+    async def async_do_reboot(self, recursive=False, force=False):
         async with Remote.sshify([self, ]):
+            from pyfaros.updater.updater import do_reboot
+            if force:
+                for chain_idx in range(self.LAST_POSSIBLE_CHAIN):
+                    if chain_idx in self.REFERENCE_NODE_CHAIN:
+                        device = self.chains[chain_idx]
+                        await device.async_do_reboot(recursive, force)
+                    else:
+                        cmd = "sudo -n chain_power reboot {}".format(chain_idx+1)
+                        await self.ssh_connection.run(cmd, check=True, term_type='xterm')
+            else:
+                for device in self.walk(depth=1 if recursive else 0):
+                    if device != self:
+                        await device.async_do_reboot(recursive, force)
+
+            print("Rebooting {}".format(self.serial))
             await do_reboot(self)
 
 class Discover:
