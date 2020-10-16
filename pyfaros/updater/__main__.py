@@ -116,8 +116,6 @@ if __name__ == '__main__':
     extra_helps = {
         "hub:som6": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
         "hub:som9": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
-        "hub:som6_sdr": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
-        "hub:som9_sdr": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
     }
     for device in [IrisRemote, CPERemote, HubRemote, VgerRemote]:
         for v1 in device.Variant:

@@ -525,18 +525,12 @@ class HubRemote(Remote):
         HUB = "hub"
         SOM6 = "som6"
         SOM9 = "som9"
-        SOM6_SDR = "som6_sdr"
-        SOM9_SDR = "som9_sdr"
 
     Variant.HUB.support_from = []
-    Variant.SOM6.support_to = [Variant.SOM6_SDR]
-    Variant.SOM9.support_to = [Variant.SOM9_SDR]
-    Variant.SOM6_SDR.support_to = [Variant.SOM6]
-    Variant.SOM9_SDR.support_to = [Variant.SOM9]
-    Variant.SOM6.support_from = [Variant.HUB, Variant.SOM6_SDR]
-    Variant.SOM9.support_from = [Variant.HUB, Variant.SOM9_SDR]
-    Variant.SOM6_SDR.support_from = [Variant.HUB, Variant.SOM6]
-    Variant.SOM9_SDR.support_from = [Variant.HUB, Variant.SOM9]
+    Variant.SOM6.support_to = []
+    Variant.SOM9.support_to = []
+    Variant.SOM6.support_from = [Variant.HUB, ]
+    Variant.SOM9.support_from = [Variant.HUB, ]
 
     def __setitem__(self, key, value):
         """
