@@ -311,8 +311,8 @@ class IrisRemote(Remote):
         RRH = "iris030_rrh"
         UE = "iris030_ue"
         STANDARD = "iris030"
-    Variant.UE.support_from = False
-    Variant.UE.support_to = False
+    Variant.UE.support_from = []
+    Variant.UE.support_to = []
     NAME = "Iris"
 
     def __init__(self, soapy_dict, loop=None):
@@ -525,10 +525,18 @@ class HubRemote(Remote):
         HUB = "hub"
         SOM6 = "som6"
         SOM9 = "som9"
+        SOM6_SDR = "som6_sdr"
+        SOM9_SDR = "som9_sdr"
 
-    Variant.HUB.support_from = False
-    Variant.SOM6.support_to = False
-    Variant.SOM9.support_to = False
+    Variant.HUB.support_from = []
+    Variant.SOM6.support_to = [Variant.SOM6_SDR]
+    Variant.SOM9.support_to = [Variant.SOM9_SDR]
+    Variant.SOM6_SDR.support_to = [Variant.SOM6]
+    Variant.SOM9_SDR.support_to = [Variant.SOM9]
+    Variant.SOM6.support_from = [Variant.HUB, Variant.SOM6_SDR]
+    Variant.SOM9.support_from = [Variant.HUB, Variant.SOM9_SDR]
+    Variant.SOM6_SDR.support_from = [Variant.HUB, Variant.SOM6]
+    Variant.SOM9_SDR.support_from = [Variant.HUB, Variant.SOM9]
 
     def __setitem__(self, key, value):
         """

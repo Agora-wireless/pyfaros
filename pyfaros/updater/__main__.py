@@ -116,13 +116,14 @@ if __name__ == '__main__':
     extra_helps = {
         "hub:som6": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
         "hub:som9": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
+        "hub:som6_sdr": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
+        "hub:som9_sdr": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
     }
     for device in [IrisRemote, CPERemote, HubRemote, VgerRemote]:
         for v1 in device.Variant:
-            if not getattr (v1, 'support_to', True):
-                continue
-            for v2 in device.Variant:
-                if v2 is not v1 and getattr (v2, 'support_from', True):
+            support_to = getattr(v1, 'support_to', list(set(device.Variant) - {v1}))
+            for v2 in support_to:
+                if v1 in getattr (v2, 'support_from', device.Variant):
                     extra_help = extra_helps.get("{}:{}".format(v1.value, v2.value), "")
                     devname = device.__name__.strip("Remote")
                     devname_pl = devname + ("es" if devname.endswith('s') else "s")
@@ -173,14 +174,13 @@ if __name__ == '__main__':
             logging.debug("Looking for remaps, and remapping")
             for device in [IrisRemote, CPERemote, HubRemote, VgerRemote]:
                 for v1 in device.Variant:
-                    if not getattr (v1, 'support_to', True):
-                        continue
                     for v2 in device.Variant:
-                        if v2 is not v1 and getattr (v2, 'support_from', True):
-                            remap_wanted = eval('args.treat_{}_as_{}'.format(v1.value, v2.value))
-                            if remap_wanted:
-                                logging.debug("Did remap for {} to {}".format(v1.value, v2.value))
-                                update_environment.mapping[v1] = update_environment.mapping[v2]
+                        # Just use the existing of the attrbiute to determine if the operation is supported
+                        remap_name = 'treat_{}_as_{}'.format(v1.value, v2.value)
+                        remap_wanted = getattr(args, remap_name, False)
+                        if remap_wanted:
+                            logging.debug("Did remap for {} to {}".format(v1.value, v2.value))
+                            update_environment.mapping[v1] = update_environment.mapping[v2]
 
             top = Discover()
             discovered = sorted(

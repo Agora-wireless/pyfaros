@@ -95,6 +95,10 @@ class UpdateFile:
                             v_specific = HubRemote.Variant.SOM9
                         elif "-faroshub04-" in run2.stdout or "-faroshub04_somzu6eg-" in run2.stdout:
                             v_specific = HubRemote.Variant.SOM6
+                        elif "-faroshub04_somzu6eg_sdr-" in run2.stdout:
+                            v_specific = HubRemote.Variant.SOM6_SDR
+                        elif "-faroshub04_somzu9eg_sdr-" in run2.stdout:
+                            v_specific = HubRemote.Variant.SOM9_SDR
                         else:
                             v_specific = None
                     elif v_family is CPERemote.Variant:
