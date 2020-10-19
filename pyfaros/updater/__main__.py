@@ -48,6 +48,8 @@ if __name__ == '__main__':
         action="store",
         default=None)
     general_options.add_argument(
+        '-R', '--recursive', help="Upgrade all connected devices", action="store_true", required=False)
+    general_options.add_argument(
         '-n', '--dry-run',
         help="Don't actuall do the update.",
         action="store_true",
@@ -186,6 +188,14 @@ if __name__ == '__main__':
                        list(top)),
                 key=Discover.Sortings.POWER_DEPENDENCY)
             logging.debug("Discovered objects: {}".format(discovered))
+
+            if args.recursive:
+                for device in top:
+                    if device.serial in args.serial:
+                        for child_device in device.walk():
+                            if child_device.serial not in args.serial:
+                                args.serial.append(child_device.serial)
+
             if not args.patch_all:
                 discovered = list(filter(lambda x: x.serial in args.serial, discovered))
             elif args.standalone:
