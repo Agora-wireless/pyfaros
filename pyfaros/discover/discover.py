@@ -310,9 +310,9 @@ class IrisRemote(Remote):
     class Variant(_RemoteEnum):
         RRH = "iris030_rrh"
         UE = "iris030_ue"
-        STANDARD = "iris030"
-    Variant.UE.support_from = []
-    Variant.UE.support_to = []
+        STANDARD = "iris030_sdr"
+    Variant.UE.support_from = [Variant.STANDARD]
+    Variant.UE.support_to = [Variant.STANDARD]
     NAME = "Iris"
 
     def __init__(self, soapy_dict, loop=None):

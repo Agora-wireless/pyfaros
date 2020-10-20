@@ -118,6 +118,7 @@ if __name__ == '__main__':
     extra_helps = {
         "hub:som6": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
         "hub:som9": "  WARNING: Choosing the wrong type will cause the HUB to not boot and the SD will need to be externally re-imaged.",
+        "iris030_ue:iris030_sdr": "  WARNING: If the Iris is plugged in to 1 GbE fiber this WILL BREAK CONNECTIVITY to the Iris.",
     }
     for device in [IrisRemote, CPERemote, HubRemote, VgerRemote]:
         for v1 in device.Variant:
@@ -129,6 +130,7 @@ if __name__ == '__main__':
                     devname_pl = devname + ("es" if devname.endswith('s') else "s")
                     help_str = "For {} currently on a {} image, apply a {} image.{}".format(
                         devname_pl, v1.value, v2.value, extra_help)
+                    # REVISIT: This is a hacky way of having specialized help for the HUB.
                     if not getattr(v1, 'support_from', True):
                         help_str = "Apply the {} image to the {}.{}".format(v2.value, v1.value, extra_help)
                     device_type_options.add_argument(
