@@ -773,13 +773,14 @@ class Discover:
       on IO.
       """
 
-    def __init__(self, soapy_enumerate_iterations=3, output=None, timeout_ms=800, ipv6=False):
+    def __init__(self, soapy_enumerate_iterations=3, output=None, timeout_ms=800, ipv6=False, json_filename=None):
         self.time = datetime.datetime.now()
         # Grab an event loop so that we can get all of the json additional
         # information at once.
         self._loop = asyncio.new_event_loop()
         self._yaml = False
         self._json_out = False
+        self._json_filename = json_filename
         # Avahi broadcasts occasionally don't respond in time. Do it with a
         # long timeout, and do it a lot, to try to get a good picture.
         soapy_enumerations = {}
@@ -1079,7 +1080,11 @@ class Discover:
             cell_str = "Cell" + str(idx)
             config.append({cell_str: {"hub": hub.serial, "rrh": rrh_serials_conf, "sdr": sdr_serials_conf}})
 
-        with open('topology.json', 'w') as f:
+        # JSON filename
+        if self._json_filename.find('.json') == -1:
+            self._json_filename = self._json_filename + '.json'
+
+        with open(self._json_filename, 'w') as f:
             json.dump(config, f, indent = 4)
 
         ue_serials_conf = []

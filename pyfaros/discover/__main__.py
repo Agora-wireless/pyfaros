@@ -15,8 +15,8 @@ import sys
 import logging
 import pkg_resources
 import datetime
-from pyfaros.discover.discover import Discover
-
+#from pyfaros.discover.discover import Discover
+from discover import Discover
 __discover_description = """\
 Discover Skylark Wireless network topologies
 
@@ -93,6 +93,13 @@ advanced_options.add_argument(
     default=None,
 )
 advanced_options.add_argument(
+    "--json-filename",
+    action='store',
+    dest='json_filename',
+    help="Write JSON-formatted output to specified file. Only works if --json-out argument is passed",
+    default="topology.json",
+)
+advanced_options.add_argument(
     "--filter",
     choices=filtermapping,
     help="Apply filter before printing the device information.  Only works with --no-tree and does not work with --sort.",
@@ -128,7 +135,7 @@ if parsed.debug:
 else:
     logging.basicConfig(level=logging.INFO)
 
-top = Discover(soapy_enumerate_iterations=1, output=parsed.output, ipv6=parsed.prefer_ipv6)
+top = Discover(soapy_enumerate_iterations=1, output=parsed.output, ipv6=parsed.prefer_ipv6, json_filename=parsed.json_filename)
 top.set_options(yaml=parsed.yaml, json_out=parsed.json_out)
 if parsed.debug_trace:
     filename = DEFAULT_DEBUG_TRACE.format(str(datetime.datetime.now()).replace(" ", "_")) \
