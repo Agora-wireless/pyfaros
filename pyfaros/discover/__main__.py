@@ -15,8 +15,8 @@ import sys
 import logging
 import pkg_resources
 import datetime
-#from pyfaros.discover.discover import Discover
-from discover import Discover
+from pyfaros.discover.discover import Discover
+
 __discover_description = """\
 Discover Skylark Wireless network topologies
 
