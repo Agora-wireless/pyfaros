@@ -54,6 +54,12 @@ general_options.add_argument(
     help="Displays output of devices as yaml"
 )
 general_options.add_argument(
+    "-j", "--json-out",
+    action="store_true",
+    default=None,
+    help="Displays output of devices as JSON"
+)
+general_options.add_argument(
     "-d", "--debug",
     action="store_true",
     default=False,
@@ -123,7 +129,7 @@ else:
     logging.basicConfig(level=logging.INFO)
 
 top = Discover(soapy_enumerate_iterations=1, output=parsed.output, ipv6=parsed.prefer_ipv6)
-top.set_options(yaml=parsed.yaml)
+top.set_options(yaml=parsed.yaml, json_out=parsed.json_out)
 if parsed.debug_trace:
     filename = DEFAULT_DEBUG_TRACE.format(str(datetime.datetime.now()).replace(" ", "_")) \
         if parsed.debug_trace is True else parsed.debug_trace

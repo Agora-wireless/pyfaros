@@ -779,6 +779,7 @@ class Discover:
         # information at once.
         self._loop = asyncio.new_event_loop()
         self._yaml = False
+        self._json_out = False
         # Avahi broadcasts occasionally don't respond in time. Do it with a
         # long timeout, and do it a lot, to try to get a good picture.
         soapy_enumerations = {}
@@ -904,9 +905,11 @@ class Discover:
             self.single_field = ""
         self.delim = " "
 
-    def set_options(self, yaml=None):
+    def set_options(self, yaml=None, json_out=None):
         if yaml is not None:
             self._yaml = yaml
+        elif json_out is not None:
+            self._json_out = json_out
 
     def get_common(self, irises, field):
         values = set([getattr(iris, field, None) for iris in irises])
@@ -946,6 +949,8 @@ class Discover:
     def __str__(self):
         if self._yaml:
             return self._as_yaml()
+        elif self._json_out:
+            return self._as_json()
         else:
             return self._as_tree()
 
@@ -1048,6 +1053,42 @@ class Discover:
         for node in self._standalone_irises + self._cpes + self._vgers:
             config.append(node.serial)
         return yaml.dump(config)
+
+    def _as_json(self):
+        config = []
+        for idx, hub in enumerate(self._hubs):
+            hub_config = []
+            rrh_serials_conf = []
+            sdr_serials_conf = []
+            for (chidx, rrhs) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
+                if type(rrhs) is not list:
+                    rrhs = [rrhs, ]
+                for iris_idx, irises in enumerate(rrhs):
+                    if isinstance(irises, RRH) and irises.serial:
+                        rrh_config = []
+                        rrh_serials_conf.append(irises.serial)
+                        for iris in irises:
+                            rrh_config.append(iris.serial)
+                            sdr_serials_conf.append(iris.serial)
+
+                    elif len(irises) > 0:
+                        for j in [irises[k] for k in sorted(irises.keys())]:
+                            hub_config.append(j.serial)
+                            sdr_serials_conf.append(j.serial)
+
+            cell_str = "Cell" + str(idx)
+            config.append({cell_str: {"hub": hub.serial, "rrh": rrh_serials_conf, "sdr": sdr_serials_conf}})
+
+        with open('topology.json', 'w') as f:
+            json.dump(config, f, indent = 4)
+
+        ue_serials_conf = []
+        for node in self._standalone_irises + self._cpes + self._vgers:
+            ue_serials_conf.append(node.serial)
+
+        # No need to include clients in topology file, just print them out
+        config.append({"Standalone Clients": ue_serials_conf})
+        return json.dumps(config, indent = 4)
 
     # To save more fields on the test dump, add the values to this dictionary.
     TEST_CONFIG_FORMAT = {
