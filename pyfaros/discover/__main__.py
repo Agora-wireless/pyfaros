@@ -54,6 +54,12 @@ general_options.add_argument(
     help="Displays output of devices as yaml"
 )
 general_options.add_argument(
+    "-j", "--json-out",
+    action="store_true",
+    default=None,
+    help="Displays output of devices as JSON"
+)
+general_options.add_argument(
     "-d", "--debug",
     action="store_true",
     default=False,
@@ -85,6 +91,13 @@ advanced_options.add_argument(
     choices=["serial", "address"],
     help="Display a single field for each node. Uses one line per RRH.",
     default=None,
+)
+advanced_options.add_argument(
+    "--json-filename",
+    action='store',
+    dest='json_filename',
+    help="Write JSON-formatted output to specified file. Only works if --json-out argument is passed",
+    default="topology.json",
 )
 advanced_options.add_argument(
     "--filter",
@@ -122,8 +135,8 @@ if parsed.debug:
 else:
     logging.basicConfig(level=logging.INFO)
 
-top = Discover(soapy_enumerate_iterations=1, output=parsed.output, ipv6=parsed.prefer_ipv6)
-top.set_options(yaml=parsed.yaml)
+top = Discover(soapy_enumerate_iterations=1, output=parsed.output, ipv6=parsed.prefer_ipv6, json_filename=parsed.json_filename)
+top.set_options(yaml=parsed.yaml, json_out=parsed.json_out)
 if parsed.debug_trace:
     filename = DEFAULT_DEBUG_TRACE.format(str(datetime.datetime.now()).replace(" ", "_")) \
         if parsed.debug_trace is True else parsed.debug_trace
