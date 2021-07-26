@@ -1061,6 +1061,7 @@ class Discover:
             hub_config = []
             rrh_serials_conf = []
             sdr_serials_conf = []
+            calib_serials_conf = []
             for (chidx, rrhs) in [(k, hub.chains[k]) for k in sorted(hub.chains.keys())]:
                 if type(rrhs) is not list:
                     rrhs = [rrhs, ]
@@ -1075,10 +1076,12 @@ class Discover:
                     elif len(irises) > 0:
                         for j in [irises[k] for k in sorted(irises.keys())]:
                             hub_config.append(j.serial)
-                            sdr_serials_conf.append(j.serial)
+                            # sdr_serials_conf.append(j.serial)
+                            calib_serials_conf.append(j.serial) # Calib nodes
+                            print("SERIAL: {}, ChainIdx: {}, j.serial: {}".format(irises.serial, chidx, j.serial))
 
             cell_str = "Cell" + str(idx)
-            config.append({cell_str: {"hub": hub.serial, "rrh": rrh_serials_conf, "sdr": sdr_serials_conf}})
+            config.append({cell_str: {"hub": hub.serial, "rrh": rrh_serials_conf, "sdr": sdr_serials_conf, "calib": calib_serials_conf}})
 
         # JSON filename
         if self._json_filename.find('.json') == -1:
