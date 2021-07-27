@@ -1074,15 +1074,13 @@ class Discover:
                             sdr_serials_conf.append(iris.serial)
 
                     elif len(irises) > 0:
-                        print("NumCalib: {}".format(len(irises)))
                         for j in [irises[k] for k in sorted(irises.keys())]:
                             hub_config.append(j.serial)
                             # sdr_serials_conf.append(j.serial)
                             calib_serials_conf = j.serial  # Calib nodes
-                            print("SERIAL: {}, ChainIdx: {}, j.serial: {}".format(irises.serial, chidx, calib_serials_conf))
 
             cell_str = "Cell" + str(idx)
-            config.append({cell_str: {"hub": hub.serial, "rrh": rrh_serials_conf, "sdr": sdr_serials_conf, "calib": calib_serials_conf}})
+            config.append({cell_str: {"hub": hub.serial, "rrh": rrh_serials_conf, "sdr": sdr_serials_conf, "reference node": calib_serials_conf}})
 
         # JSON filename
         if self._json_filename.find('.json') == -1:
