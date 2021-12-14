@@ -1056,6 +1056,7 @@ class Discover:
         return yaml.dump(config)
 
     def _as_json(self):
+        bs_config = []
         config = []
         for idx, hub in enumerate(self._hubs):
             hub_config = []
@@ -1079,8 +1080,14 @@ class Discover:
                             # sdr_serials_conf.append(j.serial)
                             calib_serials_conf = j.serial  # Calib nodes
 
-            cell_str = "Cell" + str(idx)
-            config.append({cell_str: {"hub": hub.serial, "rrh": rrh_serials_conf, "sdr": sdr_serials_conf, "reference node": calib_serials_conf}})
+            cell_str = "BS" + str(idx)
+            bs_config.append({cell_str: {"hub": hub.serial, "rrh": rrh_serials_conf, "sdr": sdr_serials_conf, "reference": calib_serials_conf}})
+
+        ue_serials_conf = []
+        for node in self._standalone_irises + self._cpes + self._vgers:
+            ue_serials_conf.append(node.serial)
+
+        config = {"BaseStations": bs_config[0], "Clients": {"sdr" : ue_serials_conf}}
 
         # JSON filename
         if self._json_filename.find('.json') == -1:
@@ -1089,12 +1096,6 @@ class Discover:
         with open(self._json_filename, 'w') as f:
             json.dump(config, f, indent = 4)
 
-        ue_serials_conf = []
-        for node in self._standalone_irises + self._cpes + self._vgers:
-            ue_serials_conf.append(node.serial)
-
-        # No need to include clients in topology file, just print them out
-        config.append({"Standalone Clients": ue_serials_conf})
         return json.dumps(config, indent = 4)
 
     # To save more fields on the test dump, add the values to this dictionary.
