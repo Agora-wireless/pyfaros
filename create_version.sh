@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-version="0.0.5"
+version="0.1.4"
 
 main () {
     progname=$0
