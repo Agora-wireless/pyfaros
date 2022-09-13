@@ -18,3 +18,4 @@ asyncssh==1.18.0
 PyYAML>=5.3.1
 scp>=0.13.2
 paramiko==2.7.1
+pyOpenSSL==22.0.0; python_version >= '3.8'
