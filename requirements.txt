@@ -1,21 +1,17 @@
-aiohttp==3.8.1; python_version >= '3.8'
-aiohttp==3.5.4; python_version < '3.8'
-async-timeout==4.0.2; python_version >= '3.8'
-async-timeout==3.0.1; python_version < '3.8'
-charset-normalizer; python_version >= '3.8'
+aiohttp
+async-timeout
+charset-normalizer
 multidict; python_version > '3.8'
-attrs==19.1.0
-chardet==3.0.4
-idna==2.8
-idna-ssl==1.1.0
-multidict==4.5.2
-treelib==1.5.5
-typing-extensions==3.7.4
-yarl==1.3.0
-async-exit-stack==1.0.1; python_version < '3.7'
-async-generator==1.10; python_version < '3.7'
-asyncssh==1.18.0
-PyYAML>=5.3.1
-scp>=0.13.2
-paramiko==2.7.1
-pyOpenSSL==22.0.0; python_version >= '3.8'
+attrs
+chardet
+idna
+idna-ssl
+multidict
+treelib
+typing-extensions
+yarl
+asyncssh
+PyYAML
+scp
+paramiko
+pyOpenSSL
