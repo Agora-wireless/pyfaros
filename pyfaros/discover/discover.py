@@ -55,7 +55,6 @@ def is_ipv4(address: str) -> bool:
 
 
 class _RemoteEnum(Enum):
-
     @staticmethod
     def _generate_next_value_(name):
         return str(hash(name))
@@ -127,7 +126,7 @@ class Remote:
             ])
             yield list(connections)
 
-    def __init__(self, soapy_dict, loop=None):
+    def __init__(self, soapy_dict):
         self.error = False
         self.soapy_dict = soapy_dict
         self.driver = soapy_dict["driver"] if "driver" in soapy_dict else None
@@ -146,9 +145,8 @@ class Remote:
         self.username = None
         self.password = None
         self._json = None  # default no json
-        self._aioloop = loop if loop is not None else asyncio.get_event_loop()
         # ensure only one connection exists at a time.
-        self._ssh_lock = asyncio.Lock(loop=self._aioloop)
+        self._ssh_lock = asyncio.Lock()
         self.ssh_connection = None
         self.ssh_session = MethodType(Remote._ssh_session_no_connection, self)
 
@@ -159,7 +157,6 @@ class Remote:
         self.username = username
         self.password = password
 
-    @asyncio.coroutine
     async def afetch(self):
         """
             Asynchronous method to fetch additional information from the device.
@@ -226,8 +223,8 @@ class CPERemote(Remote):
     class Variant(_RemoteEnum):
         STANDARD = "cpe"
 
-    def __init__(self, soapy_dict, loop=None):
-        super().__init__(soapy_dict, loop=loop)
+    def __init__(self, soapy_dict):
+        super().__init__(soapy_dict)
         self.rrh_head = None
         # About us, set by us
         self.last_mac = None
@@ -246,7 +243,6 @@ class CPERemote(Remote):
         yield self
         return
 
-    @asyncio.coroutine
     async def afetch(self):
         try:
             await super().afetch()
@@ -273,8 +269,8 @@ class VgerRemote(Remote):
     class Variant(_RemoteEnum):
         VGER = "vger"
 
-    def __init__(self, soapy_dict, loop=None):
-        super().__init__(soapy_dict, loop=loop)
+    def __init__(self, soapy_dict):
+        super().__init__(soapy_dict)
         self.rrh_head = None
         # About us, set by us
         self.last_mac = None
@@ -292,7 +288,6 @@ class VgerRemote(Remote):
         yield self
         return
 
-    @asyncio.coroutine
     async def afetch(self):
         try:
             await super().afetch()
@@ -323,8 +318,8 @@ class IrisRemote(Remote):
     #Variant.UE.support_to = [Variant.STANDARD, Variant.RRH]
     NAME = "Iris"
 
-    def __init__(self, soapy_dict, loop=None):
-        super().__init__(soapy_dict, loop=loop)
+    def __init__(self, soapy_dict):
+        super().__init__(soapy_dict)
         # Unique soapy keys
         self.sfp_serial = soapy_dict.get("sfpSerial", None)
         self.sfp_version = soapy_dict.get("sfpVersion", None)
@@ -356,7 +351,6 @@ class IrisRemote(Remote):
         yield self
         return
 
-    @asyncio.coroutine
     async def afetch(self):
         try:
             await super().afetch()
@@ -562,8 +556,8 @@ class HubRemote(Remote):
                         return chain
             return None
 
-    def __init__(self, soapy_dict, loop=None):
-        super().__init__(soapy_dict, loop=loop)
+    def __init__(self, soapy_dict):
+        super().__init__(soapy_dict)
         self.error = False
         self.cpld = soapy_dict["cpld"] if "cpld" in soapy_dict else None
         url = urllib.parse.urlparse(self.remote)
@@ -607,13 +601,20 @@ class HubRemote(Remote):
     def _update_irises(self):
         hub = SoapySDR.Device(self.soapy_dict)
         hub.writeRegister("FAROS_TOP", 0xa0, (0xff << 24))
-        asyncio.get_event_loop().run_until_complete(asyncio.gather(*[iris.afetch() for iris in self._irises]))
+        find_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(find_loop)
+        # gather with an unpacked list of awaitables
+        iris_func_list = [iris.afetch() for iris in self._irises]
+        get_all_iris = asyncio.gather(*iris_func_list, return_exceptions=True)
+        find_loop.run_until_complete(get_all_iris)
+        find_loop.close()
 
     def _map_irises(self, irises):
         """
             Given all possible irises, figure out which ones are connected directly
             to this hub.
             """
+        print("MAPPING")
         self._irises = list(
             filter(lambda x: x.last_mac in self.macmatches, irises))
         self._update_irises()
@@ -703,7 +704,6 @@ class HubRemote(Remote):
 
         return rrhs, error
 
-    @asyncio.coroutine
     async def afetch(self):
         try:
             await super().afetch()
@@ -773,14 +773,13 @@ class Discover:
       on IO.
       """
 
-    def __init__(self, soapy_enumerate_iterations=3, output=None, timeout_ms=800, ipv6=False, json_filename=None):
+    def __init__(self, soapy_enumerate_iterations=1, output=None, timeout_ms=800, ipv6=False, json_filename=None):
         self.time = datetime.datetime.now()
-        # Grab an event loop so that we can get all of the json additional
-        # information at once.
-        self._loop = asyncio.new_event_loop()
         self._yaml = False
         self._json_out = False
         self._json_filename = json_filename
+        event_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(event_loop)
         # Avahi broadcasts occasionally don't respond in time. Do it with a
         # long timeout, and do it a lot, to try to get a good picture.
         soapy_enumerations = {}
@@ -801,7 +800,7 @@ class Discover:
         # FIXME: Hacks here until all cpes have a sane fpga string.
         self._irises = list(
             map(
-                partial(IrisRemote, loop=self._loop),
+                partial(IrisRemote),
                 filter(
                     lambda x: "remote:type" in
                     x.keys() and "iris" in x["remote:type"] and "serial" in x.keys()
@@ -810,10 +809,19 @@ class Discover:
                 ),
             ))
 
+        self._hubs = list(
+            map(
+                partial(HubRemote),
+                filter(
+                    lambda x: "remote:type" in x.keys() and "faros" in x[
+                        "remote:type"],
+                    self._soapy_enumerate,
+                ),
+            ))
         # FIXME: change this when fpga strings are sane
         self._cpes = list(
             map(
-                partial(CPERemote, loop=self._loop),
+                partial(CPERemote),
                 filter(
                     lambda x: "remote:type" in x.keys() and "cpe" in x["remote:type"] and
                      "serial" in x.keys() and "CP" in x["serial"],
@@ -824,57 +832,40 @@ class Discover:
         # FIXME: confirm correct strings for this
         self._vgers = list(
             map(
-                partial(VgerRemote, loop=self._loop),
+                partial(VgerRemote),
                 filter(
                     lambda x: "remote:type" in x.keys() and "cpe" in x["remote:type"] and
                      "serial" in x.keys() and "VG" in x["serial"],
                     self._soapy_enumerate,
                 ),
             ))
-
-        self._hubs = list(
-            map(
-                partial(HubRemote, loop=self._loop),
-                filter(
-                    lambda x: "remote:type" in x.keys() and "faros" in x[
-                        "remote:type"],
-                    self._soapy_enumerate,
-                ),
-            ))
         # Stage up the fetches
         iris_fetch_tasks = asyncio.gather(
             *map(
-                lambda x: asyncio.ensure_future(x.afetch(), loop=self._loop),
+                lambda x: asyncio.ensure_future(x.afetch()),
                 self._irises,
-            ),
-            loop=self._loop)
-        cpe_fetch_tasks = asyncio.gather(
-            *map(
-                lambda x: asyncio.ensure_future(x.afetch(), loop=self._loop),
-                self._cpes,
-            ),
-            loop=self._loop)
-        vger_fetch_tasks = asyncio.gather(
-            *map(
-                lambda x: asyncio.ensure_future(x.afetch(), loop=self._loop),
-                self._vgers,
-            ),
-            loop=self._loop)
+            ))
+
         hub_fetch_tasks = asyncio.gather(
             *map(
-                lambda x: asyncio.ensure_future(x.afetch(), loop=self._loop),
+                lambda x: asyncio.ensure_future(x.afetch()),
                 self._hubs,
-            ),
-            loop=self._loop)
+            ))
+        cpe_fetch_tasks = asyncio.gather(
+            *map(
+                lambda x: asyncio.ensure_future(x.afetch()),
+                self._cpes,
+            ))
+        vger_fetch_tasks = asyncio.gather(
+            *map(
+                lambda x: asyncio.ensure_future(x.afetch()),
+                self._vgers,
+            ))
         # Go, go, go!
-        fetchall = asyncio.ensure_future(
-            asyncio.gather(
-                iris_fetch_tasks, hub_fetch_tasks, cpe_fetch_tasks, vger_fetch_tasks,
-                loop=self._loop),
-            loop=self._loop,
-        )
-        self._all = self._loop.run_until_complete(fetchall)
-        self._loop.close()
+        fetchall = asyncio.gather(iris_fetch_tasks,hub_fetch_tasks)
+        self._all = event_loop.run_until_complete(fetchall)
+        event_loop.close()
+
         # Doing this bidirectionally so that neither class modifies the other,
         # it can be more efficient than this, but looping over each provides
         # the opportunity to catch inconsistencies and detect strange
