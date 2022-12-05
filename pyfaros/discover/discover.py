@@ -614,7 +614,6 @@ class HubRemote(Remote):
             Given all possible irises, figure out which ones are connected directly
             to this hub.
             """
-        print("MAPPING")
         self._irises = list(
             filter(lambda x: x.last_mac in self.macmatches, irises))
         self._update_irises()
