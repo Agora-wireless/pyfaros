@@ -31,5 +31,5 @@ setuptools.setup(
     include_package_data=True,
     data_files=[('.',['version.py', 'requirements.txt']),],
     install_requires=install_requires,
-    python_requires='>=3.6',
+    python_requires='>=3.10',
 )
