@@ -1,4 +1,4 @@
-aiohttp
+aiohttp==3.8.4
 async-timeout
 charset-normalizer
 multidict; python_version > '3.8'
