@@ -7,7 +7,7 @@
 #	OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #	DEALINGS IN THE SOFTWARE.
 #
-# Copyright (c) 2020, 2021 Skylark Wireless.
+# Copyright (c) 2020-2024 Skylark Wireless.
 
 import sys
 import argparse
@@ -227,9 +227,7 @@ if __name__ == '__main__':
                     update_environment.mapping[device.variant].bootbit,
                     update_environment.mapping[device.variant].imageub))
             if not args.dry_run:
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(update_devices(update_environment, discovered, args))
-                loop.close()
+                asyncio.run(update_devices(update_environment, discovered, args))
     except Exception as e:
         logging.debug(e)
         raise e
